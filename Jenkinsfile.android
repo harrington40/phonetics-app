@@ -16,6 +16,8 @@ pipeline {
     environment {
         PROJECT_NAME = "phonetics-app-android"
         FLUTTER_DIR = "flutter_app"
+        FLUTTER_HOME = "${HOME}/flutter"
+        PATH = "${HOME}/flutter/bin:${PATH}"
         FLUTTER_VERSION = "3.16.0"
         BUILD_TYPE = "release"
         OUTPUT_DIR = "build/app/outputs"
@@ -50,12 +52,20 @@ pipeline {
             steps {
                 echo '=== Setting up Flutter ==='
                 sh '''
+                    # Setup Flutter
+                    FLUTTER_HOME="$HOME/flutter"
+                    
                     # Check if Flutter is installed
-                    if ! command -v flutter &> /dev/null; then
+                    if [ ! -d "$FLUTTER_HOME" ]; then
                         echo "Flutter not found. Installing..."
-                        git clone https://github.com/flutter/flutter.git -b stable /opt/flutter
-                        export PATH="$PATH:/opt/flutter/bin"
+                        git clone https://github.com/flutter/flutter.git -b stable "$FLUTTER_HOME"
                     fi
+                    
+                    # Add to PATH
+                    export PATH="$PATH:$FLUTTER_HOME/bin"
+                    
+                    # Accept licenses
+                    yes | flutter doctor --android-licenses || true
                     
                     flutter --version
                     flutter doctor -v
