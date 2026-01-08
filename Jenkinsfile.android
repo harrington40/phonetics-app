@@ -52,6 +52,11 @@ pipeline {
             steps {
                 echo '=== Setting up Flutter ==='
                 sh '''
+                    # Install required system dependencies
+                    echo "Installing system dependencies..."
+                    sudo apt-get update -qq
+                    sudo apt-get install -y -qq unzip curl git xz-utils zip libglu1-mesa
+                    
                     # Setup Flutter
                     FLUTTER_HOME="$HOME/flutter"
                     
