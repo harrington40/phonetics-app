@@ -146,12 +146,24 @@ class AdminStats {
   final int activeUsers;
   final int totalSessions;
   final Map<String, dynamic> recentActivity;
+  final int totalTime;
+  final int masteredCount;
+  final int streak;
+  final int reviewDue;
+  final String nextReview;
+  final double masteryThreshold;
 
   AdminStats({
     required this.totalUsers,
     required this.activeUsers,
     required this.totalSessions,
     required this.recentActivity,
+    this.totalTime = 0,
+    this.masteredCount = 0,
+    this.streak = 0,
+    this.reviewDue = 0,
+    this.nextReview = "Tomorrow",
+    this.masteryThreshold = 0.8,
   });
 
   factory AdminStats.fromJson(Map<String, dynamic> json) {
@@ -160,6 +172,12 @@ class AdminStats {
       activeUsers: json['active_users'] ?? 0,
       totalSessions: json['total_sessions'] ?? 0,
       recentActivity: json['recent_activity'] ?? {},
+      totalTime: json['total_time'] ?? 0,
+      masteredCount: json['mastered_count'] ?? 0,
+      streak: json['streak'] ?? 0,
+      reviewDue: json['review_due'] ?? 0,
+      nextReview: json['next_review'] ?? "Tomorrow",
+      masteryThreshold: (json['mastery_threshold'] ?? 0.8).toDouble(),
     );
   }
 }

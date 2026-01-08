@@ -44,7 +44,7 @@ class _ParentScreenState extends ConsumerState<ParentScreen> {
                       children: [
                         Text('Total practice time',
                             style: AppTypography.bodySmall),
-                        Text('${stats['total_time'] ?? 0} min',
+                        Text('${stats.totalTime} min',
                             style: AppTypography.heading2),
                       ],
                     ),
@@ -54,7 +54,7 @@ class _ParentScreenState extends ConsumerState<ParentScreen> {
                       children: [
                         Text('Phonemes mastered',
                             style: AppTypography.bodySmall),
-                        Text('${stats['mastered_count'] ?? 0}/15',
+                        Text('${stats.masteredCount}/15',
                             style: AppTypography.heading2),
                       ],
                     ),
@@ -64,7 +64,7 @@ class _ParentScreenState extends ConsumerState<ParentScreen> {
                       children: [
                         Text('Current streak',
                             style: AppTypography.bodySmall),
-                        Text('${stats['streak'] ?? 0} days',
+                        Text('${stats.streak} days',
                             style: AppTypography.heading2),
                       ],
                     ),
@@ -168,17 +168,17 @@ class _ParentScreenState extends ConsumerState<ParentScreen> {
                   children: [
                     _buildInfoRow(
                       '📚 Review due',
-                      '${stats['review_due'] ?? 0} items',
+                      '${stats.reviewDue} items',
                     ),
                     SizedBox(height: AppSpacing.md),
                     _buildInfoRow(
                       '⏰ Next review scheduled',
-                      '${stats['next_review'] ?? "Tomorrow"}',
+                      '${stats.nextReview}',
                     ),
                     SizedBox(height: AppSpacing.md),
                     _buildInfoRow(
                       '🎯 Mastery threshold',
-                      '${stats['mastery_threshold'] ?? 0.8} (80%)',
+                      '${(stats.masteryThreshold * 100).round()}% (${(stats.masteryThreshold * 100).round()}%)',
                     ),
                     SizedBox(height: AppSpacing.md),
                     Text(

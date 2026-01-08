@@ -8,8 +8,6 @@ import '../../widgets/reusable_widgets.dart';
 class TodayScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final progressData = ref.watch(progressProvider);
-
     return Scaffold(
       backgroundColor: AppColors.bgLight,
       body: SafeArea(

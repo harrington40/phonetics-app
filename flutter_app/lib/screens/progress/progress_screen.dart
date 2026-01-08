@@ -44,7 +44,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
     );
   }
 
-  Widget _buildKidView(List data) {
+  Widget _buildKidView(ProgressData data) {
     // Sound Garden with plants (mastery visualization)
     const phonemes = [
       'a', 'e', 'i', 'o', 'u', // vowels
@@ -97,7 +97,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
     );
   }
 
-  Widget _buildParentView(List data) {
+  Widget _buildParentView(ProgressData data) {
     return SingleChildScrollView(
       padding: EdgeInsets.all(AppSpacing.md),
       child: Column(
