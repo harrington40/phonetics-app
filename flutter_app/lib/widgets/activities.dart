@@ -63,41 +63,6 @@ class _ListenChooseActivityState extends State<ListenChooseActivity> {
     );
   }
 
-  void _handleSubmit() {
-    final correct = selectedIndex == 0; // Assume first option is correct
-    setState(() => hasSubmitted = true);
-
-    // Show feedback
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        backgroundColor: AppColors.bgCard,
-        title: Text(
-          correct ? 'Nice work! 🎉' : 'Try again! 💪',
-          style: AppTypography.heading2,
-        ),
-        content: Text(
-          correct
-              ? 'You got it right!'
-              : 'The correct sound is: ${widget.item.lesson.phoneme}',
-          style: AppTypography.body,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              widget.onSubmit(hintsUsed, secondsSpent, correct);
-            },
-            child: Text('Continue', style: AppTypography.buttonSmall),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final options = ['${widget.item.lesson.phoneme}', 'b', 'p', 'm'];
@@ -256,42 +221,6 @@ class _BuildWordActivityState extends State<BuildWordActivity> {
     });
   }
 
-  void _handleSubmit() {
-    final word = slots.join();
-    final correct = word == 'cat'; // Simplified check
-
-    setState(() => hasSubmitted = true);
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppRadius.lg),
-          ),
-          backgroundColor: AppColors.bgCard,
-          title: Text(
-            correct ? 'Perfect blend! 🎉' : 'Try again! 💪',
-            style: AppTypography.heading2,
-          ),
-          content: Text(
-            correct ? 'You spelled "$word" correctly!' : 'The word is: cat',
-            style: AppTypography.body,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-                widget.onSubmit(hintsUsed, secondsSpent, correct);
-              },
-              child: Text('Continue', style: AppTypography.buttonSmall),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -405,38 +334,6 @@ class _ReadPickActivityState extends State<ReadPickActivity> {
     setState(() => hintsUsed++);
     // TODO: Play word audio
     print('Reading aloud: cat');
-  }
-
-  void _handleSubmit() {
-    final correct = selectedImage == 0; // Assume first image is correct
-    setState(() => hasSubmitted = true);
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        backgroundColor: AppColors.bgCard,
-        title: Text(
-          correct ? 'Great reading! 🎉' : 'Try again! 📖',
-          style: AppTypography.heading2,
-        ),
-        content: Text(
-          correct ? 'You picked the right picture!' : 'That\'s a dog, not a cat!',
-          style: AppTypography.body,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              widget.onSubmit(hintsUsed, secondsSpent, correct);
-            },
-            child: Text('Continue', style: AppTypography.buttonSmall),
-          ),
-        ],
-      ),
-    );
   }
 
   @override
