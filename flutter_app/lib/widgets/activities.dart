@@ -297,7 +297,7 @@ class _BuildWordActivityState extends State<BuildWordActivity> {
             width: 120,
             height: 120,
             decoration: BoxDecoration(
-              color: AppColors.primaryPastel.withOpacity(0.2),
+              color: AppColors.primaryPastel.withValues(alpha: 0.2),
               borderRadius: BorderRadius.circular(AppRadius.md),
             ),
             child: Icon(Icons.image, size: 60, color: AppColors.primaryPastel),

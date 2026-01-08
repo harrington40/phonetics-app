@@ -22,7 +22,7 @@ class BigPrimaryButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryPastel,
-          disabledBackgroundColor: AppColors.primaryPastel.withOpacity(0.5),
+          disabledBackgroundColor: AppColors.primaryPastel.withValues(alpha: 0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.lg),
           ),

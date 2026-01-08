@@ -17,6 +17,11 @@ final currentStreakProvider = StateProvider<int>((ref) => 0);
 
 final sessionStartTimeProvider = StateProvider<DateTime?>((ref) => null);
 
+final adminStatsProvider = FutureProvider((ref) async {
+  final apiService = ref.watch(apiServiceProvider);
+  return apiService.getAdminStats();
+});
+
 class SessionNotifier extends StateNotifier<List<SessionItem>> {
   final ApiService apiService;
 

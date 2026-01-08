@@ -75,19 +75,35 @@ class ApiService {
     }
   }
 
-  Future<Map<String, dynamic>> getAdminStats() async {
+  Future<AdminStats> getAdminStats() async {
     try {
       final response = await http.get(
         Uri.parse('${ApiConfig.backendUrl}/admin/stats'),
       ).timeout(ApiConfig.timeout);
 
       if (response.statusCode == 200) {
-        return jsonDecode(response.body);
+        return AdminStats.fromJson(jsonDecode(response.body));
       } else {
         throw Exception('Failed to load admin stats: ${response.statusCode}');
       }
     } catch (e) {
       throw Exception('Error fetching admin stats: $e');
+    }
+  }
+
+  Future<ProgressData> getProgress() async {
+    try {
+      final response = await http.get(
+        Uri.parse('${ApiConfig.backendUrl}/progress'),
+      ).timeout(ApiConfig.timeout);
+
+      if (response.statusCode == 200) {
+        return ProgressData.fromJson(jsonDecode(response.body));
+      } else {
+        throw Exception('Failed to load progress: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error fetching progress: $e');
     }
   }
 }

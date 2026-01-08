@@ -117,3 +117,49 @@ class SessionFeedback {
     };
   }
 }
+
+class ProgressData {
+  final int totalSessions;
+  final int completedToday;
+  final int streak;
+  final Map<String, dynamic> wordMastery;
+
+  ProgressData({
+    required this.totalSessions,
+    required this.completedToday,
+    required this.streak,
+    required this.wordMastery,
+  });
+
+  factory ProgressData.fromJson(Map<String, dynamic> json) {
+    return ProgressData(
+      totalSessions: json['total_sessions'] ?? 0,
+      completedToday: json['completed_today'] ?? 0,
+      streak: json['streak'] ?? 0,
+      wordMastery: json['word_mastery'] ?? {},
+    );
+  }
+}
+
+class AdminStats {
+  final int totalUsers;
+  final int activeUsers;
+  final int totalSessions;
+  final Map<String, dynamic> recentActivity;
+
+  AdminStats({
+    required this.totalUsers,
+    required this.activeUsers,
+    required this.totalSessions,
+    required this.recentActivity,
+  });
+
+  factory AdminStats.fromJson(Map<String, dynamic> json) {
+    return AdminStats(
+      totalUsers: json['total_users'] ?? 0,
+      activeUsers: json['active_users'] ?? 0,
+      totalSessions: json['total_sessions'] ?? 0,
+      recentActivity: json['recent_activity'] ?? {},
+    );
+  }
+}

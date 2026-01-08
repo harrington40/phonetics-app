@@ -123,7 +123,7 @@ class _ProgressScreenState extends ConsumerState<ProgressScreen> {
                   child: LinearProgressIndicator(
                     value: 8 / 15,
                     minHeight: 8,
-                    backgroundColor: Colors.white.withOpacity(0.5),
+                    backgroundColor: Colors.white.withValues(alpha: 0.5),
                     valueColor: AlwaysStoppedAnimation<Color>(
                       AppColors.primaryPastel,
                     ),
