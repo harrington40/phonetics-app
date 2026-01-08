@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activate PhonicsLearn License</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        .license-container {
+            background: white;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .logo {
+            text-align: center;
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 2rem;
+        }
+
+        .license-options {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .option-btn {
+            flex: 1;
+            padding: 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .option-btn.active {
+            border-color: #667eea;
+            background: rgba(102,126,234,0.1);
+        }
+
+        .option-btn:hover {
+            border-color: #667eea;
+        }
+
+        .option-title {
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5rem;
+        }
+
+        .option-subtitle {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102,126,234,0.3);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 1rem;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .btn-secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .trial-info {
+            background: rgba(255,193,7,0.1);
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 5px;
+        }
+
+        .trial-info h3 {
+            color: #f57c00;
+            margin-bottom: 0.5rem;
+            font-size: 1rem;
+        }
+
+        .trial-info ul {
+            margin-left: 1.5rem;
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .license-status {
+            display: none;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+
+        .license-status.success {
+            background: rgba(76,175,80,0.1);
+            border: 2px solid #4caf50;
+            color: #2e7d32;
+        }
+
+        .license-status.error {
+            background: rgba(244,67,54,0.1);
+            border: 2px solid #f44336;
+            color: #c62828;
+        }
+
+        .license-status.warning {
+            background: rgba(255,152,0,0.1);
+            border: 2px solid #ff9800;
+            color: #e65100;
+        }
+
+        .divider {
+            text-align: center;
+            margin: 2rem 0;
+            position: relative;
+        }
+
+        .divider::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: #e0e0e0;
+        }
+
+        .divider span {
+            background: white;
+            padding: 0 1rem;
+            position: relative;
+            color: #999;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .license-info {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-top: 1.5rem;
+        }
+
+        .license-info-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .license-info-item:last-child {
+            border-bottom: none;
+        }
+
+        .license-info-label {
+            color: #666;
+        }
+
+        .license-info-value {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .link {
+            color: #667eea;
+            text-decoration: none;
+            text-align: center;
+            display: block;
+            margin-top: 1rem;
+        }
+
+        .link:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="license-container">
+        <div class="logo">📚</div>
+        <h1>Welcome to PhonicsLearn</h1>
+        <p class="subtitle">Activate your license to get started</p>
+
+        <div id="licenseStatus" class="license-status"></div>
+
+        <div class="license-options">
+            <div class="option-btn active" onclick="selectOption('trial')">
+                <div class="option-title">Free Trial</div>
+                <div class="option-subtitle">14 days free</div>
+            </div>
+            <div class="option-btn" onclick="selectOption('existing')">
+                <div class="option-title">Have a Key?</div>
+                <div class="option-subtitle">Enter license</div>
+            </div>
+        </div>
+
+        <!-- Free Trial Section -->
+        <div id="trialSection">
+            <div class="trial-info">
+                <h3>🎉 Start Your Free 14-Day Trial</h3>
+                <ul>
+                    <li>Access to 10 lessons</li>
+                    <li>Up to 3 students</li>
+                    <li>Progress tracking</li>
+                    <li>No credit card required</li>
+                </ul>
+            </div>
+
+            <div class="form-group">
+                <label for="trialEmail">Email Address</label>
+                <input type="email" id="trialEmail" placeholder="your@email.com" required>
+            </div>
+
+            <button class="btn-primary" onclick="startFreeTrial()">Start Free Trial</button>
+
+            <div class="divider"><span>OR</span></div>
+
+            <a href="landing.html" class="btn-secondary">View Pricing Plans</a>
+        </div>
+
+        <!-- Existing License Section -->
+        <div id="existingSection" class="hidden">
+            <div class="form-group">
+                <label for="licenseKey">License Key</label>
+                <input type="text" id="licenseKey" placeholder="XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX" required>
+            </div>
+
+            <button class="btn-primary" onclick="validateLicense()">Activate License</button>
+
+            <a href="landing.html" class="link">Need to purchase a license?</a>
+        </div>
+
+        <div id="licenseInfoSection" class="hidden">
+            <div class="license-info" id="licenseInfoDisplay"></div>
+            <button class="btn-primary" onclick="proceedToApp()">Continue to App →</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8000';
+        let currentLicenseKey = null;
+
+        // Check for existing license in localStorage
+        window.addEventListener('load', () => {
+            const savedLicense = localStorage.getItem('phonicslearn_license');
+            if (savedLicense) {
+                currentLicenseKey = savedLicense;
+                validateExistingLicense(savedLicense);
+            }
+        });
+
+        function selectOption(option) {
+            // Update button states
+            document.querySelectorAll('.option-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.closest('.option-btn').classList.add('active');
+
+            // Show/hide sections
+            if (option === 'trial') {
+                document.getElementById('trialSection').classList.remove('hidden');
+                document.getElementById('existingSection').classList.add('hidden');
+            } else {
+                document.getElementById('trialSection').classList.add('hidden');
+                document.getElementById('existingSection').classList.remove('hidden');
+            }
+            document.getElementById('licenseInfoSection').classList.add('hidden');
+        }
+
+        async function startFreeTrial() {
+            const email = document.getElementById('trialEmail').value;
+            
+            if (!email || !email.includes('@')) {
+                showStatus('error', 'Please enter a valid email address');
+                return;
+            }
+
+            try {
+                showStatus('warning', 'Creating your free trial...');
+                
+                const response = await fetch(`${API_URL}/license/trial?email=${encodeURIComponent(email)}`, {
+                    method: 'GET'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to create trial');
+                }
+
+                const data = await response.json();
+                currentLicenseKey = data.license_key;
+                
+                // Save license key
+                localStorage.setItem('phonicslearn_license', currentLicenseKey);
+                localStorage.setItem('phonicslearn_email', email);
+                
+                showStatus('success', `🎉 ${data.message}`);
+                displayLicenseInfo({
+                    license_type: 'Free Trial',
+                    days_remaining: 14,
+                    max_students: 3,
+                    features: { max_lessons: 10 }
+                });
+                
+                setTimeout(() => proceedToApp(), 2000);
+            } catch (error) {
+                showStatus('error', 'Failed to create trial. Please try again.');
+                console.error(error);
+            }
+        }
+
+        async function validateLicense() {
+            const licenseKey = document.getElementById('licenseKey').value.trim();
+            
+            if (!licenseKey) {
+                showStatus('error', 'Please enter your license key');
+                return;
+            }
+
+            try {
+                showStatus('warning', 'Validating license...');
+                
+                const response = await fetch(`${API_URL}/license/validate`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ license_key: licenseKey })
+                });
+
+                if (!response.ok) {
+                    throw new Error('License validation failed');
+                }
+
+                const data = await response.json();
+                
+                if (data.valid) {
+                    currentLicenseKey = licenseKey;
+                    localStorage.setItem('phonicslearn_license', licenseKey);
+                    
+                    showStatus('success', '✅ License activated successfully!');
+                    displayLicenseInfo(data);
+                    
+                    setTimeout(() => proceedToApp(), 2000);
+                } else {
+                    showStatus('error', `❌ ${data.message}`);
+                }
+            } catch (error) {
+                showStatus('error', 'Failed to validate license. Please check your key and try again.');
+                console.error(error);
+            }
+        }
+
+        async function validateExistingLicense(licenseKey) {
+            try {
+                const response = await fetch(`${API_URL}/license/info/${licenseKey}`);
+                
+                if (!response.ok) {
+                    localStorage.removeItem('phonicslearn_license');
+                    return;
+                }
+
+                const data = await response.json();
+                
+                if (data.is_valid) {
+                    showStatus('success', `Welcome back! Your ${data.license_type} license is active.`);
+                    displayLicenseInfo({
+                        license_type: data.license_type,
+                        days_remaining: data.days_remaining,
+                        max_students: data.max_students,
+                        features: data.features
+                    });
+                } else {
+                    showStatus('warning', `Your license has expired. ${data.message}`);
+                    localStorage.removeItem('phonicslearn_license');
+                }
+            } catch (error) {
+                console.error('Error validating existing license:', error);
+            }
+        }
+
+        function displayLicenseInfo(data) {
+            const infoHTML = `
+                <div class="license-info-item">
+                    <span class="license-info-label">License Type:</span>
+                    <span class="license-info-value">${data.license_type}</span>
+                </div>
+                <div class="license-info-item">
+                    <span class="license-info-label">Days Remaining:</span>
+                    <span class="license-info-value">${data.days_remaining} days</span>
+                </div>
+                <div class="license-info-item">
+                    <span class="license-info-label">Max Students:</span>
+                    <span class="license-info-value">${data.max_students}</span>
+                </div>
+                <div class="license-info-item">
+                    <span class="license-info-label">Lessons Available:</span>
+                    <span class="license-info-value">${data.features.max_lessons}</span>
+                </div>
+            `;
+            
+            document.getElementById('licenseInfoDisplay').innerHTML = infoHTML;
+            document.getElementById('licenseInfoSection').classList.remove('hidden');
+            document.getElementById('trialSection').classList.add('hidden');
+            document.getElementById('existingSection').classList.add('hidden');
+        }
+
+        function showStatus(type, message) {
+            const statusEl = document.getElementById('licenseStatus');
+            statusEl.className = `license-status ${type}`;
+            statusEl.textContent = message;
+            statusEl.style.display = 'block';
+        }
+
+        function proceedToApp() {
+            if (currentLicenseKey) {
+                window.location.href = `index.html?license=${currentLicenseKey}`;
+            } else {
+                showStatus('error', 'No valid license found');
+            }
+        }
+    </script>
+</body>
+</html>

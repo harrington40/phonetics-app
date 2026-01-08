@@ -1,0 +1,740 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phonetics Learning Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h1 {
+            color: #333;
+            font-size: 2em;
+        }
+
+        .user-info {
+            text-align: right;
+        }
+
+        .user-info p {
+            color: #666;
+            margin: 5px 0;
+        }
+
+        nav {
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            gap: 20px;
+        }
+
+        nav button {
+            padding: 10px 20px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        nav button.active {
+            background: #667eea;
+            color: white;
+        }
+
+        nav button:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .stat-card h3 {
+            color: #666;
+            margin-bottom: 10px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+        }
+
+        .stat-card .value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .progress-bar {
+            background: #e0e0e0;
+            height: 20px;
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+
+        .phoneme-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .phoneme-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .phoneme-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .phoneme-card.mastered {
+            border-left-color: #4caf50;
+            background: #f1f8f4;
+        }
+
+        .phoneme-card .phoneme {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 8px;
+        }
+
+        .phoneme-card .status {
+            font-size: 0.85em;
+            color: #666;
+        }
+
+        .phoneme-card .score {
+            font-size: 1.2em;
+            color: #667eea;
+            margin: 8px 0;
+        }
+
+        .lesson-container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .lesson-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .lesson-header h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .lesson-header p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        .lesson-content {
+            margin: 30px 0;
+        }
+
+        button {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        button:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .status-message {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+            font-weight: 500;
+        }
+
+        .status-message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .status-message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .status-message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .animal-canvas {
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            background: #f9f9f9;
+            margin: 20px 0;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .score-display {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .score-display .score {
+            font-size: 3em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .recommendations {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .recommendations h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .recommendation-item {
+            padding: 10px;
+            background: #f9f9f9;
+            border-left: 3px solid #667eea;
+            margin: 10px 0;
+        }
+
+        .milestone {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border-radius: 10px;
+            font-size: 1.3em;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 Phonetics Learning Center</h1>
+            <div class="user-info">
+                <p id="userName">Welcome, Student!</p>
+                <p id="userStats"></p>
+            </div>
+        </header>
+
+        <nav>
+            <button class="nav-btn active" data-page="dashboard">Dashboard</button>
+            <button class="nav-btn" data-page="learn">Learn</button>
+            <button class="nav-btn" data-page="progress">Progress</button>
+            <button class="nav-btn" data-page="settings">Settings</button>
+        </nav>
+
+        <!-- Dashboard Page -->
+        <div id="dashboard" class="page active">
+            <div id="milestone" class="milestone"></div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Phonemes Mastered</h3>
+                    <div class="value" id="masteredCount">0</div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="masteryProgress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Attempts</h3>
+                    <div class="value" id="totalAttempts">0</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Score</h3>
+                    <div class="value" id="avgScore">0%</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Current Streak</h3>
+                    <div class="value" id="streak">0</div>
+                </div>
+            </div>
+
+            <h2 style="color: white; margin-top: 30px; margin-bottom: 15px;">Your Phonemes</h2>
+            <div class="phoneme-list" id="phonemeList"></div>
+
+            <h2 style="color: white; margin-top: 30px; margin-bottom: 15px;">Recommendations</h2>
+            <div id="recommendationsContainer"></div>
+        </div>
+
+        <!-- Learn Page -->
+        <div id="learn" class="page">
+            <div class="lesson-container">
+                <div class="lesson-header">
+                    <h2>📚 Lesson</h2>
+                    <p id="lessonPhoneme"></p>
+                </div>
+
+                <div id="statusMessage"></div>
+
+                <div class="lesson-content">
+                    <canvas id="animalCanvas" class="animal-canvas" width="300" height="300"></canvas>
+                    <div style="text-align: center;">
+                        <button id="playBtn" onclick="playLesson()">🔊 Play & Animate</button>
+                        <button id="nextBtn" onclick="getNextLesson()">➡️ Next Lesson</button>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <h3 id="lessonPrompt" style="color: #333;"></h3>
+                </div>
+
+                <div class="lesson-content">
+                    <h3 style="color: #333; margin-bottom: 15px;">Rate Your Performance</h3>
+                    <div style="text-align: center;">
+                        <button onclick="recordAttempt(0.5)">⭐ Needs Practice</button>
+                        <button onclick="recordAttempt(0.75)">⭐⭐ Good</button>
+                        <button onclick="recordAttempt(0.9)">⭐⭐⭐ Excellent</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Progress Page -->
+        <div id="progress" class="page">
+            <div class="lesson-container">
+                <h2>📊 Learning Progress</h2>
+                <div id="progressContent" style="margin-top: 20px;"></div>
+            </div>
+        </div>
+
+        <!-- Settings Page -->
+        <div id="settings" class="page">
+            <div class="lesson-container">
+                <h2>⚙️ Settings</h2>
+                <div style="margin-top: 20px;">
+                    <div style="margin: 20px 0;">
+                        <label style="display: block; margin-bottom: 10px;">
+                            User ID: <input type="text" id="userId" value="student1" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                        </label>
+                    </div>
+                    <div style="margin: 20px 0;">
+                        <label style="display: block; margin-bottom: 10px;">
+                            Username: <input type="text" id="username" value="Student" style="padding: 8px; border: 1px solid #ddd; border-radius: 5px;">
+                        </label>
+                    </div>
+                    <button onclick="initializeLearner()">Initialize/Update Profile</button>
+                    <button onclick="resetProgress()">Reset All Progress</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+        let currentLesson = null;
+        let currentUserId = 'student1';
+        let currentUsername = 'Student';
+        let isPlaying = false;
+
+        // Navigation
+        document.querySelectorAll('.nav-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                e.target.classList.add('active');
+                const pageId = e.target.getAttribute('data-page');
+                document.getElementById(pageId).classList.add('active');
+
+                if (pageId === 'dashboard') loadDashboard();
+                if (pageId === 'learn') getNextLesson();
+                if (pageId === 'progress') loadProgress();
+            });
+        });
+
+        async function initializeLearner() {
+            try {
+                currentUserId = document.getElementById('userId').value || 'student1';
+                currentUsername = document.getElementById('username').value || 'Student';
+
+                const response = await fetch(`${API_BASE}/api/learner/init?user_id=${currentUserId}&username=${currentUsername}`, {
+                    method: 'POST'
+                });
+
+                if (response.ok) {
+                    showStatus('Profile initialized!', 'success');
+                    loadDashboard();
+                } else {
+                    showStatus('Error initializing profile', 'error');
+                }
+            } catch (e) {
+                console.error('Error:', e);
+                showStatus(`Error: ${e.message}`, 'error');
+            }
+        }
+
+        async function loadDashboard() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard?user_id=${currentUserId}`);
+                const data = await response.json();
+
+                // Update header
+                document.getElementById('userName').textContent = `Welcome, ${data.user.username}!`;
+                document.getElementById('userStats').textContent = `${data.user.total_attempts} attempts • ${data.user.average_score}% average`;
+
+                // Update stats
+                document.getElementById('masteredCount').textContent = data.progress.total_phonemes_mastered;
+                document.getElementById('totalAttempts').textContent = data.user.total_attempts;
+                document.getElementById('avgScore').textContent = Math.round(data.user.average_score * 100) + '%';
+                document.getElementById('streak').textContent = data.user.current_streak;
+
+                // Update progress bar
+                const total = data.progress.mastered_phonemes.length + data.progress.in_progress_phonemes.length;
+                const percent = total > 0 ? (data.progress.mastered_phonemes.length / total * 100) : 0;
+                document.getElementById('masteryProgress').style.width = percent + '%';
+
+                // Update milestone
+                document.getElementById('milestone').textContent = data.next_milestone;
+
+                // Display phonemes
+                const phonemeList = document.getElementById('phonemeList');
+                phonemeList.innerHTML = '';
+
+                [...data.progress.mastered_phonemes, ...data.progress.in_progress_phonemes].forEach(phoneme => {
+                    const isMastered = data.progress.mastered_phonemes.includes(phoneme);
+                    const card = document.createElement('div');
+                    card.className = `phoneme-card ${isMastered ? 'mastered' : ''}`;
+                    card.innerHTML = `
+                        <div class="phoneme">${phoneme}</div>
+                        <div class="status">${isMastered ? '✓ Mastered' : '📚 Learning'}</div>
+                    `;
+                    phonemeList.appendChild(card);
+                });
+
+                // Display recommendations
+                const recContainer = document.getElementById('recommendationsContainer');
+                recContainer.innerHTML = '';
+
+                if (data.recommendations.focus_areas.length > 0) {
+                    const rec = document.createElement('div');
+                    rec.className = 'recommendations';
+                    rec.innerHTML = `
+                        <h3>Focus Areas</h3>
+                        ${data.recommendations.focus_areas.map(item => `
+                            <div class="recommendation-item">
+                                <strong>${item[0]}</strong> - Score: ${(item[1] * 100).toFixed(0)}%
+                            </div>
+                        `).join('')}
+                    `;
+                    recContainer.appendChild(rec);
+                }
+
+            } catch (e) {
+                console.error('Error loading dashboard:', e);
+            }
+        }
+
+        async function getNextLesson() {
+            try {
+                const response = await fetch(`${API_BASE}/api/lesson/next?user_id=${currentUserId}`);
+                const data = await response.json();
+                currentLesson = data;
+
+                document.getElementById('lessonPhoneme').textContent = data.phoneme;
+                document.getElementById('lessonPrompt').textContent = data.prompt;
+                document.getElementById('statusMessage').innerHTML = `
+                    <div class="status-message info">
+                        Priority: ${Math.round(data.priority_score * 100)}% | 
+                        Attempts: ${data.attempts_so_far} | 
+                        Current Score: ${Math.round(data.current_score * 100)}%
+                    </div>
+                `;
+
+                // Draw animal
+                drawAnimal('rest');
+
+                document.getElementById('playBtn').disabled = false;
+            } catch (e) {
+                console.error('Error:', e);
+                showStatus(`Error: ${e.message}`, 'error');
+            }
+        }
+
+        async function playLesson() {
+            if (!currentLesson || isPlaying) return;
+            isPlaying = true;
+            document.getElementById('playBtn').disabled = true;
+
+            try {
+                const phoneme = currentLesson.phoneme;
+                const audioUrl = `${API_BASE}/api/audio?phoneme=${encodeURIComponent(phoneme)}`;
+
+                const response = await fetch(audioUrl);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const audioUrl2 = URL.createObjectURL(blob);
+                    const audio = new Audio(audioUrl2);
+
+                    audio.onended = () => {
+                        isPlaying = false;
+                        document.getElementById('playBtn').disabled = false;
+                        drawAnimal('rest');
+                    };
+
+                    audio.play();
+                    showStatus('Playing audio...', 'info');
+                } else {
+                    showStatus('Failed to load audio', 'error');
+                    isPlaying = false;
+                    document.getElementById('playBtn').disabled = false;
+                }
+            } catch (e) {
+                console.error('Error:', e);
+                showStatus(`Error: ${e.message}`, 'error');
+                isPlaying = false;
+                document.getElementById('playBtn').disabled = false;
+            }
+        }
+
+        async function recordAttempt(score) {
+            try {
+                const response = await fetch(
+                    `${API_BASE}/api/attempt/record?user_id=${currentUserId}&phoneme=${encodeURIComponent(currentLesson.phoneme)}&score=${score}`,
+                    { method: 'POST' }
+                );
+
+                if (response.ok) {
+                    const data = await response.json();
+                    showStatus(`Recorded! Next review: ${new Date(data.next_review).toLocaleDateString()}`, 'success');
+                    loadDashboard();
+                } else {
+                    showStatus('Error recording attempt', 'error');
+                }
+            } catch (e) {
+                console.error('Error:', e);
+                showStatus(`Error: ${e.message}`, 'error');
+            }
+        }
+
+        async function loadProgress() {
+            try {
+                const response = await fetch(`${API_BASE}/api/phoneme/all-progress?user_id=${currentUserId}`);
+                const data = await response.json();
+
+                let html = `<table style="width: 100%; border-collapse: collapse;">
+                    <tr style="background: #f0f0f0;">
+                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Phoneme</th>
+                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Attempts</th>
+                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Success Rate</th>
+                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Score</th>
+                        <th style="padding: 10px; text-align: left; border: 1px solid #ddd;">Status</th>
+                    </tr>`;
+
+                Object.entries(data.phoneme_progress).forEach(([phoneme, stats]) => {
+                    html += `<tr style="border: 1px solid #ddd;">
+                        <td style="padding: 10px;">${phoneme}</td>
+                        <td style="padding: 10px;">${stats.total_attempts}</td>
+                        <td style="padding: 10px;">${Math.round(stats.success_rate * 100)}%</td>
+                        <td style="padding: 10px;">${Math.round(stats.average_score * 100)}%</td>
+                        <td style="padding: 10px;">${stats.mastered ? '✓ Mastered' : '📚 Learning'}</td>
+                    </tr>`;
+                });
+
+                html += '</table>';
+                document.getElementById('progressContent').innerHTML = html;
+            } catch (e) {
+                console.error('Error:', e);
+            }
+        }
+
+        async function resetProgress() {
+            if (confirm('Are you sure? This will reset all progress!')) {
+                try {
+                    const response = await fetch(
+                        `${API_BASE}/api/reset-progress?user_id=${currentUserId}`,
+                        { method: 'POST' }
+                    );
+
+                    if (response.ok) {
+                        showStatus('Progress reset!', 'success');
+                        loadDashboard();
+                    }
+                } catch (e) {
+                    console.error('Error:', e);
+                }
+            }
+        }
+
+        function drawAnimal(viseme) {
+            const canvas = document.getElementById('animalCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw simple rabbit
+            ctx.fillStyle = '#FFD1DC';
+
+            // Body
+            ctx.beginPath();
+            ctx.ellipse(150, 200, 60, 80, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Head
+            ctx.beginPath();
+            ctx.arc(150, 100, 50, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Ears
+            ctx.beginPath();
+            ctx.ellipse(120, 30, 15, 40, -0.3, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.ellipse(180, 30, 15, 40, 0.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Eyes
+            ctx.fillStyle = 'black';
+            ctx.beginPath();
+            ctx.arc(130, 85, 6, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(170, 85, 6, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Mouth based on viseme
+            ctx.strokeStyle = 'black';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+
+            if (viseme === 'smile') {
+                ctx.arc(150, 110, 15, 0, Math.PI);
+            } else if (viseme === 'open') {
+                ctx.ellipse(150, 115, 12, 18, 0, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (viseme === 'round') {
+                ctx.arc(150, 115, 10, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                ctx.moveTo(135, 110);
+                ctx.lineTo(165, 110);
+            }
+
+            ctx.stroke();
+        }
+
+        function showStatus(message, type) {
+            const statusDiv = document.getElementById('statusMessage');
+            if (statusDiv) {
+                statusDiv.innerHTML = `<div class="status-message ${type}">${message}</div>`;
+            }
+        }
+
+        // Initialize on load
+        window.addEventListener('load', () => {
+            initializeLearner();
+        });
+    </script>
+</body>
+</html>

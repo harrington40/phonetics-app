@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phonetics Admin Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2.5em;
+            font-weight: 700;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .nav-btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 1.4em;
+        }
+
+        .stat-value {
+            font-size: 2.5em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .stat-trend {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .charts-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .chart-card h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        .progress-table {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            overflow-x: auto;
+        }
+
+        .progress-table h3 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #eee;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.3s;
+        }
+
+        .student-row:hover {
+            background: #f8f9fa;
+        }
+
+        .algorithm-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .algorithm-card h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .algorithm-metrics {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .metric {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .metric-value {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .metric-label {
+            font-size: 0.9em;
+            color: #666;
+        }
+
+        .controls-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .control-group select,
+        .control-group input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1em;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 50px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .nav-buttons {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="header">
+            <h1>📊 Phonetics Admin Dashboard</h1>
+            <div class="nav-buttons">
+                <a href="index.html" class="nav-btn">← Back to Learning</a>
+                <button class="nav-btn btn-secondary" onclick="refreshData()">🔄 Refresh</button>
+            </div>
+        </div>
+
+        <div id="loading" class="loading">
+            <h2>Loading dashboard data...</h2>
+        </div>
+
+        <div id="dashboardContent" style="display: none;">
+            <!-- Statistics Cards -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>👥 Total Students</h3>
+                    <div class="stat-value" id="totalStudents">0</div>
+                    <div class="stat-trend" id="studentsTrend">Loading...</div>
+                </div>
+                <div class="stat-card">
+                    <h3>📚 Active Lessons</h3>
+                    <div class="stat-value" id="activeLessons">15</div>
+                    <div class="stat-trend">All phonemes available</div>
+                </div>
+                <div class="stat-card">
+                    <h3>🎯 Average Accuracy</h3>
+                    <div class="stat-value" id="avgAccuracy">0%</div>
+                    <div class="stat-trend" id="accuracyTrend">Loading...</div>
+                </div>
+                <div class="stat-card">
+                    <h3>⏱️ Avg Session Time</h3>
+                    <div class="stat-value" id="avgSessionTime">0m</div>
+                    <div class="stat-trend" id="sessionTrend">Loading...</div>
+                </div>
+            </div>
+
+            <!-- Learning Algorithm Metrics -->
+            <div class="algorithm-card">
+                <h3>🧠 Learning Algorithm Performance</h3>
+                <div class="algorithm-metrics">
+                    <div class="metric">
+                        <div class="metric-value" id="spacedRepetition">0%</div>
+                        <div class="metric-label">Spaced Repetition Effectiveness</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="adaptiveDifficulty">0%</div>
+                        <div class="metric-label">Adaptive Difficulty Success</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="personalization">0%</div>
+                        <div class="metric-label">Personalization Score</div>
+                    </div>
+                    <div class="metric">
+                        <div class="metric-value" id="retentionRate">0%</div>
+                        <div class="metric-label">Knowledge Retention</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts -->
+            <div class="charts-container">
+                <div class="chart-card">
+                    <h3>📈 Learning Progress Over Time</h3>
+                    <canvas id="progressChart" width="400" height="300"></canvas>
+                </div>
+                <div class="chart-card">
+                    <h3>🎯 Phoneme Mastery Distribution</h3>
+                    <canvas id="phonemeChart" width="400" height="300"></canvas>
+                </div>
+            </div>
+
+            <!-- Student Progress Table -->
+            <div class="progress-table">
+                <h3>📊 Student Progress Details</h3>
+                <table id="studentsTable">
+                    <thead>
+                        <tr>
+                            <th>Student ID</th>
+                            <th>Current Phoneme</th>
+                            <th>Progress</th>
+                            <th>Accuracy</th>
+                            <th>Last Session</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentsTableBody">
+                        <!-- Data will be populated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Controls Section -->
+            <div class="controls-section">
+                <h3>⚙️ Learning Algorithm Controls</h3>
+                <div class="control-group">
+                    <label for="difficultyMode">Difficulty Adjustment Mode:</label>
+                    <select id="difficultyMode">
+                        <option value="adaptive">Adaptive (Recommended)</option>
+                        <option value="manual">Manual</option>
+                        <option value="fixed">Fixed</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label for="spacedRepetitionInterval">Spaced Repetition Interval (hours):</label>
+                    <input type="number" id="spacedRepetitionInterval" value="24" min="1" max="168">
+                </div>
+                <div class="control-group">
+                    <label for="feedbackIntensity">Feedback Intensity:</label>
+                    <select id="feedbackIntensity">
+                        <option value="gentle">Gentle</option>
+                        <option value="normal">Normal</option>
+                        <option value="intensive">Intensive</option>
+                    </select>
+                </div>
+                <button class="btn" onclick="updateAlgorithmSettings()">💾 Save Settings</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadDashboardData();
+        });
+
+        async function loadDashboardData() {
+            try {
+                // Load various analytics data
+                await Promise.all([
+                    loadStudentStats(),
+                    loadAlgorithmMetrics(),
+                    loadProgressData(),
+                    loadStudentTable()
+                ]);
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboardContent').style.display = 'block';
+            } catch (error) {
+                console.error('Error loading dashboard:', error);
+                document.getElementById('loading').innerHTML = '<h2>❌ Error loading dashboard data</h2><p>Please check the backend connection.</p>';
+            }
+        }
+
+        async function loadStudentStats() {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/stats`);
+                if (!response.ok) throw new Error('Failed to load stats');
+
+                const stats = await response.json();
+
+                document.getElementById('totalStudents').textContent = stats.total_students || 0;
+                document.getElementById('avgAccuracy').textContent = `${stats.avg_accuracy || 0}%`;
+                document.getElementById('avgSessionTime').textContent = `${stats.avg_session_time || 0}m`;
+
+                // Update trends
+                document.getElementById('studentsTrend').textContent = stats.students_trend || 'No trend data';
+                document.getElementById('accuracyTrend').textContent = stats.accuracy_trend || 'No trend data';
+                document.getElementById('sessionTrend').textContent = stats.session_trend || 'No trend data';
+            } catch (error) {
+                console.error('Error loading student stats:', error);
+                // Use mock data for demo
+                document.getElementById('totalStudents').textContent = '42';
+                document.getElementById('avgAccuracy').textContent = '78%';
+                document.getElementById('avgSessionTime').textContent = '12m';
+            }
+        }
+
+        async function loadAlgorithmMetrics() {
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/algorithm-metrics`);
+                if (!response.ok) throw new Error('Failed to load algorithm metrics');
+
+                const metrics = await response.json();
+
+                document.getElementById('spacedRepetition').textContent = `${metrics.spaced_repetition || 85}%`;
+                document.getElementById('adaptiveDifficulty').textContent = `${metrics.adaptive_difficulty || 92}%`;
+                document.getElementById('personalization').textContent = `${metrics.personalization || 88}%`;
+                document.getElementById('retentionRate').textContent = `${metrics.retention_rate || 94}%`;
+            } catch (error) {
+                console.error('Error loading algorithm metrics:', error);
+                // Use mock data for demo
+                document.getElementById('spacedRepetition').textContent = '85%';
+                document.getElementById('adaptiveDifficulty').textContent = '92%';
+                document.getElementById('personalization').textContent = '88%';
+                document.getElementById('retentionRate').textContent = '94%';
+            }
+        }
+
+        async function loadProgressData() {
+            // Mock data for charts - in real implementation, this would come from API
+            const progressCtx = document.getElementById('progressChart').getContext('2d');
+            const phonemeCtx = document.getElementById('phonemeChart').getContext('2d');
+
+            // Progress over time chart
+            new Chart(progressCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4', 'Week 5', 'Week 6'],
+                    datasets: [{
+                        label: 'Average Progress',
+                        data: [15, 32, 45, 58, 72, 85],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 100
+                        }
+                    }
+                }
+            });
+
+            // Phoneme mastery chart
+            new Chart(phonemeCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Mastered', 'In Progress', 'Not Started'],
+                    datasets: [{
+                        data: [8, 5, 2],
+                        backgroundColor: ['#4CAF50', '#FF9800', '#F44336'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        async function loadStudentTable() {
+            const tbody = document.getElementById('studentsTableBody');
+
+            // Mock student data - in real implementation, this would come from API
+            const mockStudents = [
+                { id: 'STU001', phoneme: '/æ/', progress: 85, accuracy: 92, lastSession: '2 hours ago' },
+                { id: 'STU002', phoneme: '/ɪ/', progress: 72, accuracy: 88, lastSession: '5 hours ago' },
+                { id: 'STU003', phoneme: '/ʊ/', progress: 91, accuracy: 95, lastSession: '1 day ago' },
+                { id: 'STU004', phoneme: '/ɔː/', progress: 68, accuracy: 84, lastSession: '2 days ago' },
+                { id: 'STU005', phoneme: '/ə/', progress: 79, accuracy: 89, lastSession: '3 hours ago' }
+            ];
+
+            tbody.innerHTML = mockStudents.map(student => `
+                <tr class="student-row">
+                    <td>${student.id}</td>
+                    <td>${student.phoneme}</td>
+                    <td>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width: ${student.progress}%"></div>
+                        </div>
+                        ${student.progress}%
+                    </td>
+                    <td>${student.accuracy}%</td>
+                    <td>${student.lastSession}</td>
+                    <td>
+                        <button class="btn" onclick="viewStudent('${student.id}')">👁️ View</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function updateAlgorithmSettings() {
+            const settings = {
+                difficultyMode: document.getElementById('difficultyMode').value,
+                spacedRepetitionInterval: parseInt(document.getElementById('spacedRepetitionInterval').value),
+                feedbackIntensity: document.getElementById('feedbackIntensity').value
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/api/admin/algorithm-settings`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(settings)
+                });
+
+                if (response.ok) {
+                    alert('✅ Algorithm settings updated successfully!');
+                } else {
+                    throw new Error('Failed to update settings');
+                }
+            } catch (error) {
+                console.error('Error updating settings:', error);
+                alert('❌ Failed to update settings. Using default values.');
+            }
+        }
+
+        function viewStudent(studentId) {
+            alert(`Viewing details for student: ${studentId}\n\nThis would open a detailed student progress view in a real implementation.`);
+        }
+
+        function refreshData() {
+            document.getElementById('dashboardContent').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            loadDashboardData();
+        }
+    </script>
+</body>
+</html></content>
+<parameter name="filePath">/mnt/c/Users/harri/designProject2020/education-projs/phonetics-app/admin.html

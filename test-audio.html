@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Audio Test - Phonetics App</title>
+    <style>
+        body { font-family: Arial; margin: 20px; }
+        .test { margin: 20px; padding: 10px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        .result { margin-top: 10px; padding: 10px; background: #f0f0f0; }
+        .error { color: red; }
+        .success { color: green; }
+    </style>
+</head>
+<body>
+    <h1>Audio Endpoint Debugging</h1>
+    
+    <div class="test">
+        <h2>1. Test API Connection</h2>
+        <button onclick="testAPI()">Test API</button>
+        <div id="apiResult" class="result"></div>
+    </div>
+
+    <div class="test">
+        <h2>2. Test Audio Endpoint</h2>
+        <button onclick="testAudio()">Test Audio Endpoint</button>
+        <div id="audioResult" class="result"></div>
+    </div>
+
+    <div class="test">
+        <h2>3. Play Audio Directly</h2>
+        <select id="phonemeSelect">
+            <option value="p">/p/</option>
+            <option value="m">/m/</option>
+            <option value="s">/s/</option>
+        </select>
+        <button onclick="playAudio()">Play</button>
+        <audio id="audioPlayer" controls></audio>
+        <div id="playResult" class="result"></div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+
+        async function testAPI() {
+            const result = document.getElementById('apiResult');
+            try {
+                const response = await fetch(`${API_BASE}/api/lesson`);
+                if (response.ok) {
+                    const data = await response.json();
+                    result.innerHTML = `<span class="success">✓ API Working</span><br/>Lesson: ${data.phoneme}`;
+                } else {
+                    result.innerHTML = `<span class="error">✗ API Error: ${response.status}</span>`;
+                }
+            } catch (e) {
+                result.innerHTML = `<span class="error">✗ Connection Error: ${e.message}</span>`;
+            }
+        }
+
+        async function testAudio() {
+            const result = document.getElementById('audioResult');
+            try {
+                const response = await fetch(`${API_BASE}/api/audio/p`);
+                result.innerHTML = `Response Status: ${response.status}<br/>`;
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    result.innerHTML += `<span class="success">✓ Audio Generated</span><br/>Size: ${(blob.size / 1024).toFixed(1)}KB<br/>Type: ${blob.type}`;
+                } else {
+                    result.innerHTML += `<span class="error">✗ Error: ${response.status} ${response.statusText}</span>`;
+                }
+            } catch (e) {
+                result.innerHTML = `<span class="error">✗ Error: ${e.message}</span>`;
+            }
+        }
+
+        async function playAudio() {
+            const phoneme = document.getElementById('phonemeSelect').value;
+            const result = document.getElementById('playResult');
+            const player = document.getElementById('audioPlayer');
+            
+            try {
+                const url = `${API_BASE}/api/audio/${phoneme}`;
+                const response = await fetch(url);
+                
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const audioUrl = URL.createObjectURL(blob);
+                    player.src = audioUrl;
+                    result.innerHTML = `<span class="success">✓ Audio loaded and ready to play</span>`;
+                } else {
+                    result.innerHTML = `<span class="error">✗ Failed to load audio: ${response.status}</span>`;
+                }
+            } catch (e) {
+                result.innerHTML = `<span class="error">✗ Error: ${e.message}</span>`;
+            }
+        }
+
+        // Auto-test on load
+        window.addEventListener('load', () => {
+            console.log('Testing API and audio endpoints...');
+            testAPI();
+        });
+    </script>
+</body>
+</html>

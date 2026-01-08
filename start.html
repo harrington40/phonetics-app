@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phonetics Learning System - Portal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+
+        header {
+            text-align: center;
+            color: white;
+            margin-bottom: 50px;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.95;
+            margin-bottom: 20px;
+        }
+
+        .status-board {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .status-board h2 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .status-item {
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+        }
+
+        .status-item.running {
+            border-left-color: #4caf50;
+        }
+
+        .status-item h3 {
+            color: #333;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
+
+        .status-item p {
+            color: #666;
+            font-size: 0.9em;
+            margin: 5px 0;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            margin-top: 8px;
+        }
+
+        .status-badge.running {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.developing {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .applications {
+            margin-bottom: 40px;
+        }
+
+        .applications h2 {
+            color: white;
+            margin-bottom: 20px;
+            font-size: 2em;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .app-card {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+        }
+
+        .app-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .app-card-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .app-card-header h3 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+        }
+
+        .app-card-header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .app-card-body {
+            padding: 20px;
+        }
+
+        .app-card-body p {
+            color: #666;
+            margin: 10px 0;
+            line-height: 1.6;
+        }
+
+        .features-list {
+            list-style: none;
+            margin: 15px 0;
+        }
+
+        .features-list li {
+            color: #666;
+            padding: 5px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .features-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        .app-card button {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1em;
+            cursor: pointer;
+            font-weight: bold;
+            transition: opacity 0.3s;
+        }
+
+        .app-card button:hover {
+            opacity: 0.9;
+        }
+
+        .app-card button:active {
+            transform: scale(0.98);
+        }
+
+        .documentation {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .documentation h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .doc-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .doc-link {
+            padding: 15px;
+            background: #f9f9f9;
+            border-left: 4px solid #667eea;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: transform 0.3s;
+            display: block;
+        }
+
+        .doc-link:hover {
+            transform: translateX(5px);
+            background: #f0f0f0;
+        }
+
+        .doc-link h3 {
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .doc-link p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .api-info {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .api-info h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .api-endpoints {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .endpoint {
+            background: white;
+            padding: 10px;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+            font-family: monospace;
+            font-size: 0.9em;
+        }
+
+        footer {
+            text-align: center;
+            color: white;
+            padding: 20px;
+            opacity: 0.8;
+        }
+
+        .badge-grid {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            background: #667eea;
+            color: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 Phonetics Learning System</h1>
+            <p>Complete intelligent learning platform with spaced repetition & adaptive difficulty</p>
+        </header>
+
+        <!-- Status Board -->
+        <div class="status-board">
+            <h2>System Status</h2>
+            <div class="status-grid">
+                <div class="status-item running">
+                    <h3>Backend API</h3>
+                    <p>http://localhost:8000</p>
+                    <p>FastAPI + Learning Algorithm</p>
+                    <span class="status-badge running">✓ Running</span>
+                </div>
+                <div class="status-item running">
+                    <h3>Web Server</h3>
+                    <p>http://localhost:3000</p>
+                    <p>Interactive Dashboard & Demo</p>
+                    <span class="status-badge running">✓ Running</span>
+                </div>
+                <div class="status-item running">
+                    <h3>Real Voice Audio</h3>
+                    <p>Google Text-to-Speech</p>
+                    <p>Natural pronunciation</p>
+                    <span class="status-badge running">✓ Active</span>
+                </div>
+                <div class="status-item running">
+                    <h3>Database</h3>
+                    <p>In-Memory (Production-Ready)</p>
+                    <p>Multi-user support</p>
+                    <span class="status-badge running">✓ Ready</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Applications -->
+        <div class="applications">
+            <h2>Applications & Pages</h2>
+            <div class="app-grid">
+                <!-- Student Learning App -->
+                <div class="app-card">
+                    <div class="app-card-header">
+                        <h3>📚 Student Learning App</h3>
+                        <p>Main Interactive Learning</p>
+                    </div>
+                    <div class="app-card-body">
+                        <p><strong>Primary app for students to learn phonetics.</strong></p>
+                        <ul class="features-list">
+                            <li>Get phoneme lessons</li>
+                            <li>Animated mouth graphics</li>
+                            <li>Record & practice</li>
+                            <li>Real-time feedback</li>
+                        </ul>
+                        <div class="badge-grid">
+                            <span class="badge">⭐ Primary</span>
+                            <span class="badge">Students</span>
+                        </div>
+                        <button onclick="window.location='index.html'">Open Learning App →</button>
+                    </div>
+                </div>
+
+                <!-- Activity Graphics Demo -->
+                <div class="app-card">
+                    <div class="app-card-header">
+                        <h3>🎨 Activity Graphics Demo</h3>
+                        <p>Interactive Animations Preview</p>
+                    </div>
+                    <div class="app-card-body">
+                        <p><strong>Preview all 5 animated activity graphics.</strong></p>
+                        <ul class="features-list">
+                            <li>Listen & Choose animation</li>
+                            <li>Build Word animation</li>
+                            <li>Read & Pick animation</li>
+                            <li>Reward celebration</li>
+                            <li>Progress plant</li>
+                        </ul>
+                        <div class="badge-grid">
+                            <span class="badge">Demo</span>
+                        </div>
+                        <button onclick="window.location='activity-graphics-demo.html'">View Graphics →</button>
+                    </div>
+                </div>
+
+                <!-- Kids Learning Graphics -->
+                <div class="app-card">
+                    <div class="app-card-header">
+                        <h3>🌟 Kids Graphics Showcase</h3>
+                        <p>Kid-Friendly Animations</p>
+                    </div>
+                    <div class="app-card-body">
+                        <p><strong>Colorful graphics designed for children.</strong></p>
+                        <ul class="features-list">
+                            <li>Bouncing letters</li>
+                            <li>Animated characters</li>
+                            <li>Progress tracking visuals</li>
+                            <li>Celebration animations</li>
+                        </ul>
+                        <div class="badge-grid">
+                            <span class="badge">Kids</span>
+                        </div>
+                        <button onclick="window.location='kids-learning-graphics.html'">View Showcase →</button>
+                    </div>
+                </div>
+
+                <!-- Teacher Dashboard -->
+                <div class="app-card">
+                    <div class="app-card-header">
+                        <h3>👩‍🏫 Teacher Dashboard</h3>
+                        <p>Class Management</p>
+                    </div>
+                    <div class="app-card-body">
+                        <p><strong>Manage students and track progress.</strong></p>
+                        <ul class="features-list">
+                            <li>Student progress tracking</li>
+                            <li>Class management</li>
+                            <li>Join code system</li>
+                            <li>Performance analytics</li>
+                        </ul>
+                        <div class="badge-grid">
+                            <span class="badge">Teachers</span>
+                        </div>
+                        <button onclick="window.location='teacher-dashboard.html'">Open Teacher Panel →</button>
+                    </div>
+                </div>
+
+                <!-- Admin Dashboard -->
+                <div class="app-card">
+                    <div class="app-card-header">
+                        <h3>⚙️ Admin Dashboard</h3>
+                        <p>System Administration</p>
+                    </div>
+                    <div class="app-card-body">
+                        <p><strong>System-wide administration and monitoring.</strong></p>
+                        <ul class="features-list">
+                            <li>System statistics</li>
+                            <li>User management</li>
+                            <li>Lesson management</li>
+                            <li>API monitoring</li>
+                        </ul>
+                        <div class="badge-grid">
+                            <span class="badge">Admin</span>
+                        </div>
+                        <button onclick="window.location='admin.html'">Open Admin Panel →</button>
+                    </div>
+                </div>
+
+                <!-- General Dashboard -->
+                <div class="app-card">
+                    <div class="app-card-header">
+                        <h3>📊 General Dashboard</h3>
+                        <p>Overview & Analytics</p>
+                    </div>
+                    <div class="app-card-body">
+                        <p><strong>Complete system dashboard with analytics.</strong></p>
+                        <ul class="features-list">
+                            <li>Multi-page interface</li>
+                            <li>Progress tracking</li>
+                            <li>Smart recommendations</li>
+                            <li>Learning statistics</li>
+                        </ul>
+                        <div class="badge-grid">
+                            <span class="badge">Overview</span>
+                        </div>
+                        <button onclick="window.location='dashboard.html'">Open Dashboard →</button>
+                    </div>
+                </div>
+
+                <!-- Debug/Testing Page -->
+                <div class="app-card">
+                    <div class="app-card-header">
+                        <h3>🔧 Debug & Testing</h3>
+                        <p>Developer Tools</p>
+                    </div>
+                    <div class="app-card-body">
+                        <p><strong>API testing and debugging tools.</strong></p>
+                        <ul class="features-list">
+                            <li>API endpoint testing</li>
+                            <li>Response inspection</li>
+                            <li>Error debugging</li>
+                            <li>System diagnostics</li>
+                        </ul>
+                        <div class="badge-grid">
+                            <span class="badge">Dev Tools</span>
+                        </div>
+                        <button onclick="window.location='debug.html'">Open Debug Tools →</button>
+                    </div>
+                </div>
+
+                <!-- Audio Testing -->
+                <div class="app-card">
+                    <div class="app-card-header">
+                        <h3>🎤 Audio Testing</h3>
+                        <p>Microphone & Audio Test</p>
+                    </div>
+                    <div class="app-card-body">
+                        <p><strong>Test audio recording and playback.</strong></p>
+                        <ul class="features-list">
+                            <li>Microphone test</li>
+                            <li>Audio recording</li>
+                            <li>Playback testing</li>
+                            <li>Permission check</li>
+                        </ul>
+                        <div class="badge-grid">
+                            <span class="badge">Testing</span>
+                        </div>
+                        <button onclick="window.location='test-audio.html'">Test Audio →</button>
+                    </div>
+                </div>
+
+                <!-- API Documentation -->
+                <div class="app-card">
+                    <div class="app-card-header">
+                        <h3>📚 API Documentation</h3>
+                        <p>Interactive API Explorer</p>
+                    </div>
+                    <div class="app-card-body">
+                        <p><strong>Swagger UI for all API endpoints.</strong></p>
+                        <ul class="features-list">
+                            <li>All endpoints listed</li>
+                            <li>Try requests</li>
+                            <li>Response examples</li>
+                            <li>Data models</li>
+                            <li>Live testing</li>
+                        </ul>
+                        <div class="badge-grid">
+                            <span class="badge">Development</span>
+                            <span class="badge">Useful</span>
+                        </div>
+                        <button onclick="window.open('http://localhost:8000/docs', '_blank')">Open API Docs →</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Documentation -->
+        <div class="documentation">
+            <h2>Documentation</h2>
+            <p>Complete guides and references for the learning system:</p>
+            
+            <div class="doc-grid">
+                <a href="QUICK_START.md" class="doc-link" target="_blank">
+                    <h3>🚀 Quick Start</h3>
+                    <p>Get started in 5 minutes. Usage instructions and examples.</p>
+                </a>
+                <a href="LEARNING_SYSTEM.md" class="doc-link" target="_blank">
+                    <h3>🧠 Learning Algorithm</h3>
+                    <p>Technical deep dive into spaced repetition and adaptive learning.</p>
+                </a>
+                <a href="IMPLEMENTATION_COMPLETE.md" class="doc-link" target="_blank">
+                    <h3>✅ Implementation</h3>
+                    <p>Complete summary of all features and how they work together.</p>
+                </a>
+                <a href="README.md" class="doc-link" target="_blank">
+                    <h3>📖 Project Overview</h3>
+                    <p>Original project description and context.</p>
+                </a>
+            </div>
+
+            <div class="api-info">
+                <h3>🔌 Key API Endpoints</h3>
+                <div class="endpoint">POST /api/learner/init - Initialize user profile</div>
+                <div class="endpoint">POST /api/attempt/record - Record learning attempt</div>
+                <div class="endpoint">GET /api/dashboard - Get complete dashboard</div>
+                <div class="endpoint">GET /api/lesson/next - Get next lesson (spaced repetition)</div>
+                <div class="endpoint">GET /api/recommendations - Get personalized recommendations</div>
+                <div class="endpoint">GET /api/audio?phoneme=... - Get real voice audio</div>
+                <p style="color: #666; margin-top: 10px; font-size: 0.9em;">
+                    Full API at <strong>http://localhost:8000/docs</strong>
+                </p>
+            </div>
+        </div>
+
+        <footer>
+            <p>🎓 Phonetics Learning System v1.0 | Production Ready ✅</p>
+            <p>Backend: FastAPI | Frontend: HTML5/CSS3/JS | Audio: Google TTS</p>
+            <p style="margin-top: 10px; font-size: 0.9em;">Last Updated: December 17, 2025</p>
+        </footer>
+    </div>
+</body>
+</html>

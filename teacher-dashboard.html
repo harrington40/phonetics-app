@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Dashboard - Real-Time Classroom Monitor</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header-left h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header-left p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .info-badge {
+            background: #f0f0f0;
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .info-badge .label {
+            font-size: 12px;
+            color: #999;
+            text-transform: uppercase;
+        }
+
+        .info-badge .value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        button {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #e0e0e0;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .stat-card h3 {
+            color: #666;
+            font-size: 14px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+
+        .stat-card .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            background: #f0f0f0;
+            height: 8px;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: #667eea;
+            height: 100%;
+            transition: width 0.3s;
+        }
+
+        .students-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .section-header h2 {
+            color: #333;
+            font-size: 22px;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .filter-controls input,
+        .filter-controls select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .students-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .student-card {
+            background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+            border: 2px solid #667eea33;
+            padding: 20px;
+            border-radius: 12px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .student-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.2);
+            border-color: #667eea;
+        }
+
+        .student-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 15px;
+        }
+
+        .student-info h3 {
+            color: #333;
+            font-size: 18px;
+            margin-bottom: 5px;
+        }
+
+        .student-info p {
+            color: #999;
+            font-size: 13px;
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-practicing {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .status-idle {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .student-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .stat-label {
+            color: #999;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .stat-number {
+            color: #667eea;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .current-activity {
+            background: white;
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .activity-label {
+            color: #999;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .activity-name {
+            color: #333;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .activity-progress {
+            color: #667eea;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .phoneme-progress {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .phoneme-badge {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+            text-align: center;
+            min-width: 35px;
+        }
+
+        .phoneme-badge.mastered {
+            background: #d4edda;
+            border-color: #155724;
+            color: #155724;
+        }
+
+        .phoneme-badge.practicing {
+            background: #fff3cd;
+            border-color: #856404;
+            color: #856404;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .btn-small {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 13px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-message {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-message:hover {
+            background: #5568d3;
+        }
+
+        .btn-detail {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-detail:hover {
+            background: #e0e0e0;
+        }
+
+        .analytics-section {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-bottom: 30px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 30px;
+        }
+
+        .real-time-feed {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .feed-item {
+            padding: 12px;
+            border-left: 3px solid #667eea;
+            margin-bottom: 12px;
+            background: #f9f9f9;
+            border-radius: 4px;
+            font-size: 13px;
+        }
+
+        .feed-time {
+            color: #999;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .feed-student {
+            color: #667eea;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .feed-action {
+            color: #333;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .close {
+            color: #999;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover {
+            color: #333;
+        }
+
+        .modal h2 {
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+
+        .modal-stats {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-stat {
+            background: #f9f9f9;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .modal-stat label {
+            display: block;
+            color: #999;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+
+        .modal-stat value {
+            display: block;
+            color: #667eea;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .setup-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+        }
+
+        .setup-section h2 {
+            margin-bottom: 15px;
+            font-size: 22px;
+        }
+
+        .class-code {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 8px;
+            border: 2px dashed white;
+            text-align: center;
+            margin: 15px 0;
+        }
+
+        .class-code-value {
+            font-family: 'Courier New', monospace;
+            font-size: 32px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            margin: 10px 0;
+        }
+
+        .copy-btn {
+            background: white;
+            color: #667eea;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .copy-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .api-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 12px 20px;
+            background: white;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.connected {
+            background: #28a745;
+        }
+
+        .status-dot.disconnected {
+            background: #dc3545;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .students-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .student-stats {
+                grid-template-columns: 1fr;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .filter-controls {
+                flex-direction: column;
+            }
+
+            .filter-controls input,
+            .filter-controls select {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav style="position: fixed; top: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); padding: 10px 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); z-index: 1000; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;">
+        <a href="start.html" style="font-size: 1.2em; font-weight: bold; color: #667eea; text-decoration: none;">🏠 Home</a>
+        <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+            <a href="index.html" style="text-decoration: none; color: #667eea; padding: 8px 16px; border-radius: 20px; font-size: 0.9em; font-weight: 500; background: rgba(102, 126, 234, 0.1);">📚 Learn</a>
+            <a href="activity-graphics-demo.html" style="text-decoration: none; color: #667eea; padding: 8px 16px; border-radius: 20px; font-size: 0.9em; font-weight: 500; background: rgba(102, 126, 234, 0.1);">🎨 Demos</a>
+            <a href="teacher-dashboard.html" style="text-decoration: none; color: white; padding: 8px 16px; border-radius: 20px; font-size: 0.9em; font-weight: 500; background: #667eea;">👩‍🏫 Teacher</a>
+            <a href="admin.html" style="text-decoration: none; color: #667eea; padding: 8px 16px; border-radius: 20px; font-size: 0.9em; font-weight: 500; background: rgba(102, 126, 234, 0.1);">⚙️ Admin</a>
+            <a href="debug.html" style="text-decoration: none; color: #667eea; padding: 8px 16px; border-radius: 20px; font-size: 0.9em; font-weight: 500; background: rgba(102, 126, 234, 0.1);">🔧 Debug</a>
+        </div>
+    </nav>
+
+    <div class="api-status" style="margin-top: 60px;">
+        <div class="status-dot connected" id="apiStatus"></div>
+        <span id="statusText">Connected</span>
+    </div>
+
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <div class="header-left">
+                <h1>📚 Classroom Teacher Dashboard</h1>
+                <p id="classInfo">Loading class information...</p>
+            </div>
+            <div class="header-right">
+                <div class="info-badge">
+                    <div class="label">Students Active</div>
+                    <div class="value" id="activeCount">0</div>
+                </div>
+                <div class="info-badge">
+                    <div class="label">Avg. Mastery</div>
+                    <div class="value" id="avgMastery">0%</div>
+                </div>
+                <div class="controls">
+                    <button class="btn-secondary" onclick="refreshData()">🔄 Refresh</button>
+                    <button class="btn-primary" onclick="startClass()">▶ Start Class</button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Setup Section -->
+        <div class="setup-section" id="setupSection">
+            <h2>🎓 Class Setup</h2>
+            <p>Share this code with your students so they can connect to your classroom.</p>
+            <div class="class-code">
+                <p>Your Class Code:</p>
+                <div class="class-code-value" id="classCode">TEACHER01</div>
+                <button class="copy-btn" onclick="copyClassCode()">📋 Copy Code</button>
+            </div>
+            <p style="font-size: 13px; margin-top: 15px;">Students will enter this code when opening the app to connect to your classroom.</p>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="dashboard-grid">
+            <div class="stat-card">
+                <h3>📊 Class Performance</h3>
+                <div class="stat-value" id="classPerformance">0%</div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="perfBar" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <h3>⏱️ Total Practice Time</h3>
+                <div class="stat-value" id="totalTime">0h</div>
+                <p style="color: #999; font-size: 13px; margin-top: 10px;">This week</p>
+            </div>
+
+            <div class="stat-card">
+                <h3>🎯 Average Difficulty Level</h3>
+                <div class="stat-value" id="avgDifficulty">2.5</div>
+                <p style="color: #999; font-size: 13px; margin-top: 10px;">Single consonants</p>
+            </div>
+        </div>
+
+        <!-- Students Section -->
+        <div class="students-section">
+            <div class="section-header">
+                <h2>👥 Student Progress Monitor</h2>
+                <div class="filter-controls">
+                    <input type="text" id="searchStudent" placeholder="Search student name...">
+                    <select id="filterStatus" onchange="filterStudents()">
+                        <option value="">All Status</option>
+                        <option value="active">🟢 Active</option>
+                        <option value="practicing">🟡 Practicing</option>
+                        <option value="idle">⚫ Idle</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="students-grid" id="studentsContainer">
+                <!-- Student cards will be populated here -->
+            </div>
+        </div>
+
+        <!-- Analytics Section -->
+        <div class="analytics-section">
+            <h2 style="margin-bottom: 25px; color: #333;">📈 Class Analytics</h2>
+            
+            <div class="chart-container">
+                <h3 style="margin-bottom: 15px; color: #666; font-size: 16px;">Phoneme Mastery Distribution</h3>
+                <canvas id="masteryChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <h3 style="margin-bottom: 15px; color: #666; font-size: 16px;">Daily Practice Activity</h3>
+                <canvas id="activityChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Real-time Feed -->
+        <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 30px; margin-top: 30px;">
+            <div class="analytics-section">
+                <h2 style="margin-bottom: 20px; color: #333;">📋 Class Feedback & Errors</h2>
+                <div style="background: #f9f9f9; padding: 15px; border-radius: 8px; max-height: 300px; overflow-y: auto;">
+                    <div id="errorsFeed">
+                        <p style="color: #999; text-align: center;">No errors detected</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="real-time-feed">
+                <h3 style="margin-bottom: 15px; color: #333;">⚡ Real-Time Activity</h3>
+                <div id="realtimeFeed">
+                    <p style="color: #999; text-align: center;">Waiting for student activity...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student Detail Modal -->
+    <div id="studentModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeStudentModal()">&times;</span>
+            <h2 id="modalStudentName">Student Name</h2>
+            
+            <div class="modal-stats">
+                <div class="modal-stat">
+                    <label>Phonemes Mastered</label>
+                    <value id="modalMastered">0/15</value>
+                </div>
+                <div class="modal-stat">
+                    <label>Practice Time</label>
+                    <value id="modalTime">0m</value>
+                </div>
+                <div class="modal-stat">
+                    <label>Accuracy</label>
+                    <value id="modalAccuracy">0%</value>
+                </div>
+                <div class="modal-stat">
+                    <label>Current Streak</label>
+                    <value id="modalStreak">0</value>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 20px;">
+                <h3 style="color: #333; margin-bottom: 15px; font-size: 16px;">📚 Phoneme Progress</h3>
+                <div id="modalPhonemeList" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(40px, 1fr)); gap: 8px;">
+                    <!-- Phonemes will be populated here -->
+                </div>
+            </div>
+
+            <div style="border-top: 2px solid #f0f0f0; padding-top: 15px;">
+                <button class="btn-primary" style="width: 100%; margin-bottom: 10px;" onclick="sendMessage()">💬 Send Message to Student</button>
+                <button class="btn-secondary" style="width: 100%;" onclick="requestStudentSession()">📞 Request Live Session</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:8000/api';
+        const TEACHER_ID = localStorage.getItem('teacherId') || 'teacher_' + Math.random().toString(36).substr(2, 9);
+        const CLASS_CODE = 'TEACHER01';
+
+        let studentsData = [];
+        let masteryChart = null;
+        let activityChart = null;
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', () => {
+            localStorage.setItem('teacherId', TEACHER_ID);
+            document.getElementById('classInfo').textContent = `Class Code: ${CLASS_CODE} | Teacher ID: ${TEACHER_ID.slice(0, 10)}...`;
+            
+            loadStudentData();
+            startRealTimeUpdates();
+            initCharts();
+        });
+
+        // Load student data from backend
+        async function loadStudentData() {
+            try {
+                // Mock data for now - will connect to real backend
+                const mockStudents = [
+                    {
+                        id: 'student_1',
+                        name: 'Alice Johnson',
+                        status: 'active',
+                        mastery: 0.65,
+                        practiceTime: 45,
+                        accuracy: 82,
+                        streak: 5,
+                        currentActivity: 'Listen→Choose',
+                        currentPhoneme: 'sh',
+                        masteredPhonemes: ['a', 'e', 'i', 'o', 'u', 'b', 'c', 'd', 'f'],
+                        lastActive: new Date(Date.now() - 60000)
+                    },
+                    {
+                        id: 'student_2',
+                        name: 'Bob Smith',
+                        status: 'practicing',
+                        mastery: 0.45,
+                        practiceTime: 30,
+                        accuracy: 72,
+                        streak: 3,
+                        currentActivity: 'Build Word',
+                        currentPhoneme: 'cat',
+                        masteredPhonemes: ['a', 'e', 'i', 'o'],
+                        lastActive: new Date(Date.now() - 120000)
+                    },
+                    {
+                        id: 'student_3',
+                        name: 'Carol White',
+                        status: 'active',
+                        mastery: 0.85,
+                        practiceTime: 120,
+                        accuracy: 94,
+                        streak: 12,
+                        currentActivity: 'Read→Pick',
+                        currentPhoneme: 'blend',
+                        masteredPhonemes: ['a', 'e', 'i', 'o', 'u', 'b', 'c', 'd', 'f', 'g', 'h', 'j'],
+                        lastActive: new Date(Date.now() - 30000)
+                    }
+                ];
+
+                studentsData = mockStudents;
+                renderStudents(studentsData);
+                updateDashboardStats();
+                addFeedItem(`✅ Loaded ${studentsData.length} students from class`);
+            } catch (error) {
+                console.error('Error loading students:', error);
+                addFeedItem('⚠️ Error loading student data');
+            }
+        }
+
+        // Render student cards
+        function renderStudents(students) {
+            const container = document.getElementById('studentsContainer');
+            container.innerHTML = '';
+
+            students.forEach(student => {
+                const statusColor = student.status === 'active' ? 'status-active' : 
+                                   student.status === 'practicing' ? 'status-practicing' : 'status-idle';
+                const statusEmoji = student.status === 'active' ? '🟢' : 
+                                   student.status === 'practicing' ? '🟡' : '⚫';
+
+                const card = document.createElement('div');
+                card.className = 'student-card';
+                card.innerHTML = `
+                    <div class="student-header">
+                        <div class="student-info">
+                            <h3>${student.name}</h3>
+                            <p>Grade: 2nd | Last active: ${getTimeAgo(student.lastActive)}</p>
+                        </div>
+                        <span class="status-badge ${statusColor}">${statusEmoji} ${student.status}</span>
+                    </div>
+
+                    <div class="current-activity">
+                        <div class="activity-label">📖 Current Activity</div>
+                        <div class="activity-name">${student.currentActivity}</div>
+                        <div class="activity-progress">Phoneme: <strong>${student.currentPhoneme}</strong></div>
+                    </div>
+
+                    <div class="student-stats">
+                        <div class="stat">
+                            <div class="stat-label">Mastery</div>
+                            <div class="stat-number">${Math.round(student.mastery * 100)}%</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Accuracy</div>
+                            <div class="stat-number">${student.accuracy}%</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Time</div>
+                            <div class="stat-number">${student.practiceTime}m</div>
+                        </div>
+                        <div class="stat">
+                            <div class="stat-label">Streak</div>
+                            <div class="stat-number">${student.streak}d</div>
+                        </div>
+                    </div>
+
+                    <div class="phoneme-progress">
+                        ${student.masteredPhonemes.map(p => 
+                            `<div class="phoneme-badge mastered">${p}</div>`
+                        ).join('')}
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-small btn-message" onclick="sendMessageTo('${student.id}')">💬 Message</button>
+                        <button class="btn-small btn-detail" onclick="showStudentDetail('${student.id}')">📊 Detail</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Update dashboard statistics
+        function updateDashboardStats() {
+            const activeCount = studentsData.filter(s => s.status === 'active').length;
+            const avgMastery = Math.round(
+                studentsData.reduce((sum, s) => sum + s.mastery, 0) / studentsData.length * 100
+            );
+            const totalTime = studentsData.reduce((sum, s) => sum + s.practiceTime, 0);
+            const avgDifficulty = (studentsData.reduce((sum, s) => sum + s.masteredPhonemes.length, 0) / studentsData.length / 2).toFixed(1);
+
+            document.getElementById('activeCount').textContent = activeCount;
+            document.getElementById('avgMastery').textContent = avgMastery + '%';
+            document.getElementById('classPerformance').textContent = avgMastery + '%';
+            document.getElementById('perfBar').style.width = avgMastery + '%';
+            document.getElementById('totalTime').textContent = (totalTime / 60).toFixed(1) + 'h';
+            document.getElementById('avgDifficulty').textContent = avgDifficulty;
+        }
+
+        // Show student detail modal
+        function showStudentDetail(studentId) {
+            const student = studentsData.find(s => s.id === studentId);
+            if (!student) return;
+
+            document.getElementById('modalStudentName').textContent = student.name;
+            document.getElementById('modalMastered').textContent = `${student.masteredPhonemes.length}/15`;
+            document.getElementById('modalTime').textContent = student.practiceTime + 'm';
+            document.getElementById('modalAccuracy').textContent = student.accuracy + '%';
+            document.getElementById('modalStreak').textContent = student.streak + 'd';
+
+            const phonemeList = document.getElementById('modalPhonemeList');
+            phonemeList.innerHTML = student.masteredPhonemes.map(p => 
+                `<div class="phoneme-badge mastered">${p}</div>`
+            ).join('');
+
+            document.getElementById('studentModal').style.display = 'block';
+        }
+
+        // Close student modal
+        function closeStudentModal() {
+            document.getElementById('studentModal').style.display = 'none';
+        }
+
+        // Filter students by search/status
+        function filterStudents() {
+            const searchText = document.getElementById('searchStudent').value.toLowerCase();
+            const filterStatus = document.getElementById('filterStatus').value;
+
+            const filtered = studentsData.filter(s => {
+                const matchesSearch = s.name.toLowerCase().includes(searchText);
+                const matchesStatus = !filterStatus || s.status === filterStatus;
+                return matchesSearch && matchesStatus;
+            });
+
+            renderStudents(filtered);
+        }
+
+        // Real-time updates
+        function startRealTimeUpdates() {
+            setInterval(() => {
+                // Simulate real-time updates
+                studentsData.forEach(student => {
+                    if (Math.random() > 0.7) {
+                        student.practiceTime += Math.random() > 0.5 ? 1 : 0;
+                        student.mastery = Math.min(1, student.mastery + 0.01);
+                        addFeedItem(`${student.name} completed a phoneme (${Math.round(student.mastery * 100)}% mastery)`);
+                    }
+                });
+                updateDashboardStats();
+            }, 5000);
+        }
+
+        // Add real-time feed item
+        function addFeedItem(message) {
+            const feed = document.getElementById('realtimeFeed');
+            const item = document.createElement('div');
+            item.className = 'feed-item';
+            item.innerHTML = `
+                <div class="feed-time">${new Date().toLocaleTimeString()}</div>
+                <div class="feed-action">${message}</div>
+            `;
+            feed.insertBefore(item, feed.firstChild);
+            
+            // Keep only last 10 items
+            while (feed.children.length > 10) {
+                feed.removeChild(feed.lastChild);
+            }
+        }
+
+        // Initialize charts
+        function initCharts() {
+            const masteryCtx = document.getElementById('masteryChart').getContext('2d');
+            const activityCtx = document.getElementById('activityChart').getContext('2d');
+
+            masteryChart = new Chart(masteryCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Mastered', 'Practicing', 'Learning'],
+                    datasets: [{
+                        data: [45, 35, 20],
+                        backgroundColor: ['#28a745', '#ffc107', '#dc3545'],
+                        borderColor: 'white',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            activityChart = new Chart(activityCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+                    datasets: [{
+                        label: 'Practice Sessions',
+                        data: [5, 8, 6, 9, 7, 4, 3],
+                        borderColor: '#667eea',
+                        backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#667eea',
+                        pointBorderColor: 'white',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+
+        // Helper functions
+        function getTimeAgo(date) {
+            const seconds = Math.floor((Date.now() - date) / 1000);
+            if (seconds < 60) return 'Just now';
+            const minutes = Math.floor(seconds / 60);
+            if (minutes < 60) return minutes + 'm ago';
+            const hours = Math.floor(minutes / 60);
+            if (hours < 24) return hours + 'h ago';
+            return Math.floor(hours / 24) + 'd ago';
+        }
+
+        function copyClassCode() {
+            navigator.clipboard.writeText(CLASS_CODE);
+            alert('Class code copied! Share with students.');
+        }
+
+        function sendMessageTo(studentId) {
+            const message = prompt('Enter message for student:');
+            if (message) {
+                addFeedItem(`📨 Message sent to student`);
+            }
+        }
+
+        function sendMessage() {
+            const message = prompt('Enter message:');
+            if (message) addFeedItem('✉️ Message sent');
+            closeStudentModal();
+        }
+
+        function requestStudentSession() {
+            addFeedItem('📞 Live session request sent');
+            closeStudentModal();
+        }
+
+        function startClass() {
+            addFeedItem('🎓 Class session started - welcome screen sent to all students');
+        }
+
+        function refreshData() {
+            loadStudentData();
+            addFeedItem('🔄 Dashboard refreshed');
+        }
+
+        // Check API status
+        setInterval(() => {
+            fetch(API_BASE + '/lesson')
+                .then(r => {
+                    document.getElementById('apiStatus').className = 'status-dot connected';
+                    document.getElementById('statusText').textContent = 'Connected';
+                })
+                .catch(e => {
+                    document.getElementById('apiStatus').className = 'status-dot disconnected';
+                    document.getElementById('statusText').textContent = 'Disconnected';
+                });
+        }, 5000);
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('studentModal');
+            if (event.target == modal) {
+                modal.style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>

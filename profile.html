@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Profile - PhonicsLearn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .header {
+            background: white;
+            border-radius: 15px;
+            padding: 20px 30px;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            color: #333;
+            font-size: 24px;
+        }
+        .header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        .header .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-weight: bold;
+        }
+        .btn-secondary {
+            padding: 10px 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: background 0.3s;
+        }
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 1fr 2fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        @media (max-width: 768px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .card h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .profile-avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 48px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+        }
+        .profile-info {
+            text-align: center;
+        }
+        .profile-info h3 {
+            color: #333;
+            margin-bottom: 5px;
+            font-size: 22px;
+        }
+        .profile-info p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin: 5px;
+        }
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .form-group input:disabled {
+            background: #f5f5f5;
+            cursor: not-allowed;
+        }
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .btn-outline {
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+        }
+        .btn-outline:hover {
+            background: #667eea;
+            color: white;
+        }
+        .btn-danger {
+            background: linear-gradient(135deg, #f44336 0%, #e91e63 100%);
+        }
+        .alert {
+            padding: 12px 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border-left: 4px solid #17a2b8;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .stat-card h3 {
+            font-size: 32px;
+            margin-bottom: 5px;
+        }
+        .stat-card p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+        .license-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+        }
+        .license-info strong {
+            color: #333;
+        }
+        .license-info p {
+            margin: 8px 0;
+            color: #666;
+        }
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>🎓 My Profile</h1>
+            <div class="user-info">
+                <div class="avatar" id="headerAvatar">U</div>
+                <a href="app.html" class="btn-secondary">← Back to App</a>
+            </div>
+        </div>
+
+        <!-- Profile Grid -->
+        <div class="profile-grid">
+            <!-- Left Column: Profile Card -->
+            <div class="card">
+                <div class="profile-avatar" id="profileAvatar">U</div>
+                <div class="profile-info">
+                    <h3 id="profileName">Loading...</h3>
+                    <p id="profileEmail">loading@example.com</p>
+                    <span class="badge badge-success" id="accountStatus">Active Account</span>
+                    <div class="action-buttons" style="justify-content: center;">
+                        <button class="btn btn-outline" onclick="showEditProfile()">Edit Profile</button>
+                        <button class="btn btn-outline" onclick="showChangePassword()">Change Password</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column: Details -->
+            <div>
+                <!-- Account Stats -->
+                <div class="card" style="margin-bottom: 20px;">
+                    <h2>📊 Account Statistics</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <h3 id="studentCount">0</h3>
+                            <p>Students</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="lessonCount">0</h3>
+                            <p>Lessons Completed</p>
+                        </div>
+                        <div class="stat-card">
+                            <h3 id="daysActive">0</h3>
+                            <p>Days Active</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- License Information -->
+                <div class="card">
+                    <h2>🔑 License Information</h2>
+                    <div id="licenseInfo">
+                        <p style="text-align: center; color: #999;">Loading license information...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Edit Profile Modal (hidden by default) -->
+        <div class="card hidden" id="editProfileCard">
+            <h2>✏️ Edit Profile</h2>
+            <div id="editAlert"></div>
+            <form id="editProfileForm">
+                <div class="form-group">
+                    <label for="editFullName">Full Name</label>
+                    <input type="text" id="editFullName" placeholder="Your full name">
+                </div>
+                <div class="form-group">
+                    <label for="editEmail">Email Address</label>
+                    <input type="email" id="editEmail" disabled>
+                    <small style="color: #999;">Email cannot be changed for security reasons</small>
+                </div>
+                <div class="action-buttons">
+                    <button type="submit" class="btn">Save Changes</button>
+                    <button type="button" class="btn btn-outline" onclick="hideEditProfile()">Cancel</button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Change Password Modal (hidden by default) -->
+        <div class="card hidden" id="changePasswordCard">
+            <h2>🔒 Change Password</h2>
+            <div id="passwordAlert"></div>
+            <form id="changePasswordForm">
+                <div class="form-group">
+                    <label for="currentPassword">Current Password</label>
+                    <input type="password" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label for="newPassword">New Password</label>
+                    <input type="password" id="newPassword" required>
+                    <small style="color: #999;">Must be 8+ characters with uppercase, lowercase, and numbers</small>
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm New Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <div class="action-buttons">
+                    <button type="submit" class="btn">Update Password</button>
+                    <button type="button" class="btn btn-outline" onclick="hideChangePassword()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        let currentUser = null;
+        const API_URL = 'http://localhost:8000';
+
+        // Check authentication
+        function checkAuth() {
+            const token = localStorage.getItem('access_token');
+            if (!token) {
+                window.location.href = 'login.html';
+                return false;
+            }
+            return token;
+        }
+
+        // Load user profile
+        async function loadProfile() {
+            const token = checkAuth();
+            if (!token) return;
+
+            try {
+                const response = await fetch(`${API_URL}/auth/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to load profile');
+                }
+
+                currentUser = await response.json();
+                displayProfile(currentUser);
+                await loadLicenseInfo();
+            } catch (error) {
+                console.error('Error loading profile:', error);
+                if (error.message.includes('401')) {
+                    localStorage.removeItem('access_token');
+                    window.location.href = 'login.html';
+                }
+            }
+        }
+
+        // Display profile information
+        function displayProfile(user) {
+            const initial = user.full_name ? user.full_name[0].toUpperCase() : user.email[0].toUpperCase();
+            
+            document.getElementById('headerAvatar').textContent = initial;
+            document.getElementById('profileAvatar').textContent = initial;
+            document.getElementById('profileName').textContent = user.full_name || 'User';
+            document.getElementById('profileEmail').textContent = user.email;
+
+            // Calculate days active
+            const createdDate = new Date(user.created_at);
+            const daysActive = Math.floor((new Date() - createdDate) / (1000 * 60 * 60 * 24));
+            document.getElementById('daysActive').textContent = daysActive;
+
+            // Populate edit form
+            document.getElementById('editFullName').value = user.full_name || '';
+            document.getElementById('editEmail').value = user.email;
+        }
+
+        // Load license information
+        async function loadLicenseInfo() {
+            const token = checkAuth();
+            
+            // Mock license data (replace with actual API call)
+            const licenseHTML = `
+                <div class="license-info">
+                    <p><strong>Plan:</strong> Free Trial</p>
+                    <p><strong>Status:</strong> <span class="badge badge-success">Active</span></p>
+                    <p><strong>Expires:</strong> January 5, 2026</p>
+                    <p><strong>Max Students:</strong> 3</p>
+                    <p><strong>Max Lessons:</strong> 10</p>
+                </div>
+                <div class="action-buttons">
+                    <button class="btn" onclick="window.location.href='landing.html#pricing'">Upgrade Plan</button>
+                    <button class="btn btn-outline" onclick="window.location.href='activation.html'">Add License Key</button>
+                </div>
+            `;
+            
+            document.getElementById('licenseInfo').innerHTML = licenseHTML;
+        }
+
+        // Show edit profile form
+        function showEditProfile() {
+            document.getElementById('editProfileCard').classList.remove('hidden');
+            document.getElementById('editAlert').innerHTML = '';
+            window.scrollTo({ top: document.getElementById('editProfileCard').offsetTop - 20, behavior: 'smooth' });
+        }
+
+        // Hide edit profile form
+        function hideEditProfile() {
+            document.getElementById('editProfileCard').classList.add('hidden');
+        }
+
+        // Show change password form
+        function showChangePassword() {
+            document.getElementById('changePasswordCard').classList.remove('hidden');
+            document.getElementById('passwordAlert').innerHTML = '';
+            document.getElementById('changePasswordForm').reset();
+            window.scrollTo({ top: document.getElementById('changePasswordCard').offsetTop - 20, behavior: 'smooth' });
+        }
+
+        // Hide change password form
+        function hideChangePassword() {
+            document.getElementById('changePasswordCard').classList.add('hidden');
+        }
+
+        // Handle edit profile form submission
+        document.getElementById('editProfileForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = checkAuth();
+            const alertDiv = document.getElementById('editAlert');
+            
+            try {
+                const response = await fetch(`${API_URL}/auth/update-profile`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        full_name: document.getElementById('editFullName').value
+                    })
+                });
+
+                if (response.ok) {
+                    alertDiv.innerHTML = '<div class="alert alert-success">Profile updated successfully!</div>';
+                    await loadProfile();
+                    setTimeout(hideEditProfile, 2000);
+                } else {
+                    throw new Error('Failed to update profile');
+                }
+            } catch (error) {
+                alertDiv.innerHTML = '<div class="alert alert-error">Error updating profile. Please try again.</div>';
+            }
+        });
+
+        // Handle change password form submission
+        document.getElementById('changePasswordForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const token = checkAuth();
+            const alertDiv = document.getElementById('passwordAlert');
+            
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // Validate passwords match
+            if (newPassword !== confirmPassword) {
+                alertDiv.innerHTML = '<div class="alert alert-error">New passwords do not match!</div>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/auth/change-password?current_password=${encodeURIComponent(currentPassword)}&new_password=${encodeURIComponent(newPassword)}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.ok) {
+                    alertDiv.innerHTML = '<div class="alert alert-success">Password changed successfully!</div>';
+                    document.getElementById('changePasswordForm').reset();
+                    setTimeout(hideChangePassword, 2000);
+                } else {
+                    const error = await response.json();
+                    throw new Error(error.detail || 'Failed to change password');
+                }
+            } catch (error) {
+                alertDiv.innerHTML = `<div class="alert alert-error">${error.message}</div>`;
+            }
+        });
+
+        // Load profile on page load
+        window.addEventListener('DOMContentLoaded', loadProfile);
+    </script>
+</body>
+</html>

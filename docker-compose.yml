@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  rethinkdb:
+    image: rethinkdb:2.4.2
+    container_name: phonetics-rethinkdb
+    ports:
+      - "28015:28015"  # Client port
+      - "29015:29015"  # Cluster port
+      - "8080:8080"    # Web UI
+    volumes:
+      - rethinkdb_data:/data
+    environment:
+      - RETHINKDB_CACHE_MB=2048
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - phonetics-network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: phonetics-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - RDB_HOST=rethinkdb
+      - RDB_PORT=28015
+      - RDB_DB=phonetics
+      - PYTHONUNBUFFERED=1
+    volumes:
+      - ./backend:/app
+      - /app/__pycache__
+    depends_on:
+      rethinkdb:
+        condition: service_healthy
+    networks:
+      - phonetics-network
+    restart: unless-stopped
+    command: >
+      sh -c "python3 -m pip install --quiet -r requirements.txt &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  rethinkdb_data:
+    driver: local
+
+networks:
+  phonetics-network:
+    driver: bridge

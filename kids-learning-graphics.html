@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kids Learning Graphics - Activity Illustrations</title>
+    <style>
+        :root {
+            --primary: #B39DDB;
+            --secondary: #81C784;
+            --accent: #FFAB91;
+            --success: #4CAF50;
+            --warning: #FFC107;
+        }
+
+        body {
+            font-family: 'Nunito', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .graphics-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .graphic-card {
+            background: white;
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        .graphic-card h3 {
+            color: #333;
+            margin-top: 15px;
+            font-size: 1.3em;
+        }
+
+        svg {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .preview-section {
+            margin-top: 40px;
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .preview-section h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .activity-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .activity-card {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            border: 2px solid #ddd;
+        }
+
+        .activity-card h4 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="graphics-container">
+        <!-- Listen & Choose Activity Graphic -->
+        <div class="graphic-card">
+            <svg viewBox="0 0 300 300" width="250" height="250">
+                <!-- Background circle -->
+                <circle cx="150" cy="150" r="140" fill="#E8D5F2" opacity="0.3"/>
+                
+                <!-- Happy face character -->
+                <circle cx="150" cy="80" r="35" fill="#FFD700"/>
+                <circle cx="135" cy="70" r="5" fill="#333"/>
+                <circle cx="165" cy="70" r="5" fill="#333"/>
+                <path d="M 130 90 Q 150 105 170 90" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+                
+                <!-- Musical notes floating -->
+                <text x="80" y="60" font-size="35" text-anchor="middle">♪</text>
+                <text x="220" y="70" font-size="35" text-anchor="middle">♫</text>
+                
+                <!-- Speaker icon -->
+                <rect x="130" y="140" width="40" height="50" rx="5" fill="#B39DDB"/>
+                <polygon points="170,160 185,145 185,175" fill="#B39DDB"/>
+                
+                <!-- Sound waves -->
+                <circle cx="150" cy="165" r="20" fill="none" stroke="#81C784" stroke-width="2" opacity="0.6"/>
+                <circle cx="150" cy="165" r="35" fill="none" stroke="#81C784" stroke-width="2" opacity="0.4"/>
+                
+                <!-- Text -->
+                <text x="150" y="260" font-size="18" font-weight="bold" text-anchor="middle" fill="#333">Listen & Choose</text>
+                <text x="150" y="285" font-size="13" text-anchor="middle" fill="#666">Hear and select</text>
+            </svg>
+            <h3>🎵 Listen & Choose</h3>
+            <p>Hear the sound and tap the correct word</p>
+        </div>
+
+        <!-- Build Word Activity Graphic -->
+        <div class="graphic-card">
+            <svg viewBox="0 0 300 300" width="250" height="250">
+                <!-- Background -->
+                <circle cx="150" cy="150" r="140" fill="#D4F1D4" opacity="0.3"/>
+                
+                <!-- Smiling builder character -->
+                <circle cx="150" cy="60" r="30" fill="#FF9800"/>
+                <circle cx="138" cy="52" r="4" fill="#333"/>
+                <circle cx="162" cy="52" r="4" fill="#333"/>
+                <path d="M 135 65 Q 150 75 165 65" stroke="#333" stroke-width="2" fill="none" stroke-linecap="round"/>
+                
+                <!-- Letter blocks -->
+                <rect x="60" y="130" width="50" height="50" rx="8" fill="#FFAB91"/>
+                <text x="85" y="165" font-size="28" font-weight="bold" text-anchor="middle" fill="white">C</text>
+                
+                <rect x="125" y="110" width="50" height="50" rx="8" fill="#81C784"/>
+                <text x="150" y="145" font-size="28" font-weight="bold" text-anchor="middle" fill="white">A</text>
+                
+                <rect x="190" y="130" width="50" height="50" rx="8" fill="#B39DDB"/>
+                <text x="215" y="165" font-size="28" font-weight="bold" text-anchor="middle" fill="white">T</text>
+                
+                <!-- Arrows showing assembly -->
+                <path d="M 110 155 L 125 155" stroke="#FF6B6B" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+                <path d="M 175 135 L 190 140" stroke="#FF6B6B" stroke-width="3" fill="none" marker-end="url(#arrowhead)"/>
+                
+                <!-- Result word -->
+                <rect x="80" y="210" width="140" height="50" rx="8" fill="#FFE082"/>
+                <text x="150" y="245" font-size="24" font-weight="bold" text-anchor="middle" fill="#333">CAT</text>
+                
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#FF6B6B"/>
+                    </marker>
+                </defs>
+                
+                <!-- Text -->
+                <text x="150" y="285" font-size="18" font-weight="bold" text-anchor="middle" fill="#333">Build Word</text>
+            </svg>
+            <h3>🔤 Build Word</h3>
+            <p>Drag letters to build words</p>
+        </div>
+
+        <!-- Read & Pick Activity Graphic -->
+        <div class="graphic-card">
+            <svg viewBox="0 0 300 300" width="250" height="250">
+                <!-- Background -->
+                <circle cx="150" cy="150" r="140" fill="#FCE8D6" opacity="0.3"/>
+                
+                <!-- Curious character reading -->
+                <circle cx="150" cy="50" r="28" fill="#FF69B4"/>
+                <circle cx="138" cy="43" r="4" fill="#333"/>
+                <circle cx="162" cy="43" r="4" fill="#333"/>
+                <ellipse cx="150" cy="62" rx="8" ry="6" fill="#333"/>
+                
+                <!-- Book in front -->
+                <rect x="100" y="100" width="100" height="80" rx="5" fill="#E8D5F2"/>
+                <line x1="150" y1="100" x2="150" y2="180" stroke="#999" stroke-width="2"/>
+                
+                <!-- Left page -->
+                <text x="125" y="130" font-size="20" text-anchor="middle" fill="#333">dog</text>
+                <text x="125" y="155" font-size="20" text-anchor="middle" fill="#333">cat</text>
+                
+                <!-- Right page images -->
+                <g id="dog">
+                    <ellipse cx="175" cy="125" rx="15" ry="18" fill="#D2691E"/>
+                    <circle cx="175" cy="107" r="12" fill="#D2691E"/>
+                    <circle cx="170" cy="102" r="3" fill="#333"/>
+                </g>
+                
+                <g id="cat">
+                    <circle cx="175" cy="160" r="12" fill="#FF9800"/>
+                    <polygon points="175,145 180,140 170,140" fill="#FF9800"/>
+                    <circle cx="172" cy="158" r="2" fill="#333"/>
+                </g>
+                
+                <!-- Text -->
+                <text x="150" y="285" font-size="18" font-weight="bold" text-anchor="middle" fill="#333">Read & Pick</text>
+                <text x="150" y="305" font-size="13" text-anchor="middle" fill="#666">Match words to pictures</text>
+            </svg>
+            <h3>📖 Read & Pick</h3>
+            <p>Match words with pictures</p>
+        </div>
+
+        <!-- Reward/Celebration Graphic -->
+        <div class="graphic-card">
+            <svg viewBox="0 0 300 300" width="250" height="250">
+                <!-- Background -->
+                <circle cx="150" cy="150" r="140" fill="#FFEB3B" opacity="0.2"/>
+                
+                <!-- Celebrating character -->
+                <circle cx="150" cy="100" r="35" fill="#FF6B9D"/>
+                <circle cx="132" cy="88" r="5" fill="#333"/>
+                <circle cx="168" cy="88" r="5" fill="#333"/>
+                <path d="M 128 105 Q 150 120 172 105" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+                
+                <!-- Arms raised -->
+                <line x1="115" y1="130" x2="80" y2="90" stroke="#FF6B9D" stroke-width="8" stroke-linecap="round"/>
+                <line x1="185" y1="130" x2="220" y2="90" stroke="#FF6B9D" stroke-width="8" stroke-linecap="round"/>
+                
+                <!-- Stars and confetti -->
+                <polygon points="150,40 155,55 170,55 160,65 165,80 150,70 135,80 140,65 130,55 145,55" fill="#FFD700"/>
+                <polygon points="80,130 83,140 95,140 87,147 90,157 80,150 70,157 73,147 65,140 77,140" fill="#FF6B9D"/>
+                <polygon points="220,140 223,150 235,150 227,157 230,167 220,160 210,167 213,157 205,150 217,150" fill="#81C784"/>
+                
+                <!-- Trophy -->
+                <rect x="125" y="160" width="50" height="40" rx="3" fill="#FFD700"/>
+                <ellipse cx="150" cy="160" rx="30" ry="12" fill="#FFC107"/>
+                <rect x="140" y="200" width="20" height="30" fill="#FFD700"/>
+                <rect x="135" y="230" width="30" height="8" fill="#FFD700"/>
+                
+                <!-- Sparkles -->
+                <text x="100" y="120" font-size="30">✨</text>
+                <text x="200" y="130" font-size="30">🌟</text>
+                
+                <!-- Text -->
+                <text x="150" y="285" font-size="18" font-weight="bold" text-anchor="middle" fill="#333">Great Job!</text>
+                <text x="150" y="305" font-size="13" text-anchor="middle" fill="#666">Keep practicing</text>
+            </svg>
+            <h3>🏆 Achievement!</h3>
+            <p>Celebrate learning milestones</p>
+        </div>
+
+        <!-- Mastery Indicator Graphic -->
+        <div class="graphic-card">
+            <svg viewBox="0 0 300 300" width="250" height="250">
+                <!-- Background -->
+                <circle cx="150" cy="150" r="140" fill="#C8E6C9" opacity="0.3"/>
+                
+                <!-- Plant growing -->
+                <ellipse cx="150" cy="240" rx="30" ry="15" fill="#8B4513"/>
+                
+                <!-- Growing stages -->
+                <!-- Seed stage -->
+                <circle cx="90" cy="190" r="8" fill="#8B7355"/>
+                
+                <!-- Sprout stage -->
+                <line x1="110" y1="200" x2="110" y2="170" stroke="#7CB342" stroke-width="4" stroke-linecap="round"/>
+                <ellipse cx="105" cy="160" rx="6" ry="10" fill="#7CB342"/>
+                <ellipse cx="115" cy="160" rx="6" ry="10" fill="#7CB342"/>
+                
+                <!-- Growing stage -->
+                <line x1="150" y1="220" x2="150" y2="120" stroke="#558B2F" stroke-width="6" stroke-linecap="round"/>
+                <ellipse cx="130" cy="150" rx="10" ry="18" fill="#7CB342"/>
+                <ellipse cx="170" cy="150" rx="10" ry="18" fill="#7CB342"/>
+                <ellipse cx="135" cy="130" rx="10" ry="18" fill="#7CB342"/>
+                <ellipse cx="165" cy="130" rx="10" ry="18" fill="#7CB342"/>
+                
+                <!-- Mastered stage - Flower -->
+                <line x1="210" y1="200" x2="210" y2="80" stroke="#558B2F" stroke-width="6"/>
+                <circle cx="210" cy="70" r="25" fill="#FF1493"/>
+                <circle cx="190" cy="60" r="12" fill="#FF69B4"/>
+                <circle cx="230" cy="60" r="12" fill="#FF69B4"/>
+                <circle cx="195" cy="40" r="12" fill="#FFB6C1"/>
+                <circle cx="225" cy="40" r="12" fill="#FFB6C1"/>
+                
+                <!-- Growth labels -->
+                <text x="90" y="210" font-size="11" text-anchor="middle" fill="#333" font-weight="bold">Start</text>
+                <text x="150" y="255" font-size="11" text-anchor="middle" fill="#333" font-weight="bold">Learning</text>
+                <text x="210" y="280" font-size="11" text-anchor="middle" fill="#333" font-weight="bold">Mastery</text>
+                
+                <!-- Text -->
+                <text x="150" y="290" font-size="16" font-weight="bold" text-anchor="middle" fill="#333">Growth Path</text>
+            </svg>
+            <h3>🌱 Progress Growth</h3>
+            <p>Visualize learning progress</p>
+        </div>
+
+        <!-- Encouragement Character -->
+        <div class="graphic-card">
+            <svg viewBox="0 0 300 300" width="250" height="250">
+                <!-- Background -->
+                <circle cx="150" cy="150" r="140" fill="#BBDEFB" opacity="0.3"/>
+                
+                <!-- Friendly teacher/coach character -->
+                <circle cx="150" cy="80" r="35" fill="#FFCA28"/>
+                <circle cx="132" cy="68" r="5" fill="#333"/>
+                <circle cx="168" cy="68" r="5" fill="#333"/>
+                <path d="M 125 85 Q 150 100 175 85" stroke="#333" stroke-width="3" fill="none" stroke-linecap="round"/>
+                
+                <!-- Body -->
+                <rect x="115" y="120" width="70" height="60" rx="10" fill="#B39DDB"/>
+                
+                <!-- Arms -->
+                <line x1="115" y1="140" x2="80" y2="150" stroke="#B39DDB" stroke-width="8" stroke-linecap="round"/>
+                <line x1="185" y1="140" x2="220" y2="150" stroke="#B39DDB" stroke-width="8" stroke-linecap="round"/>
+                
+                <!-- Legs -->
+                <line x1="130" y1="180" x2="125" y2="220" stroke="#FFB74D" stroke-width="6" stroke-linecap="round"/>
+                <line x1="170" y1="180" x2="175" y2="220" stroke="#FFB74D" stroke-width="6" stroke-linecap="round"/>
+                
+                <!-- Encouraging gesture -->
+                <path d="M 75 140 Q 60 120 65 100" stroke="#FF6B6B" stroke-width="3" fill="none" marker-end="url(#arrow)"/>
+                <text x="55" y="95" font-size="24">👍</text>
+                
+                <!-- Text -->
+                <text x="150" y="260" font-size="18" font-weight="bold" text-anchor="middle" fill="#333">You Did It!</text>
+                <text x="150" y="285" font-size="13" text-anchor="middle" fill="#666">Keep going strong</text>
+                
+                <defs>
+                    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto">
+                        <polygon points="0 0, 10 3, 0 6" fill="#FF6B6B"/>
+                    </marker>
+                </defs>
+            </svg>
+            <h3>👨‍🏫 Encouragement</h3>
+            <p>Positive reinforcement graphics</p>
+        </div>
+    </div>
+
+    <!-- Activity Preview Section -->
+    <div class="preview-section">
+        <h2>📱 Activity Screen with Graphics</h2>
+        
+        <div class="activity-preview">
+            <!-- Listen & Choose Preview -->
+            <div class="activity-card">
+                <h4>🎵 Listen Exercise</h4>
+                <svg viewBox="0 0 200 200" width="120" height="120" style="margin: 0 auto; display: block;">
+                    <circle cx="100" cy="60" r="30" fill="#FFD700"/>
+                    <circle cx="85" cy="50" r="4" fill="#333"/>
+                    <circle cx="115" cy="50" r="4" fill="#333"/>
+                    <path d="M 80 65 Q 100 80 120 65" stroke="#333" stroke-width="2" fill="none"/>
+                    <text x="50" y="40" font-size="25">♪</text>
+                    <text x="150" y="50" font-size="25">♫</text>
+                    <rect x="60" y="110" width="40" height="40" rx="8" fill="#B39DDB" stroke="#333" stroke-width="2"/>
+                    <text x="80" y="137" font-size="20" text-anchor="middle">dog</text>
+                    <rect x="120" y="110" width="40" height="40" rx="8" fill="#81C784" stroke="#333" stroke-width="2"/>
+                    <text x="140" y="137" font-size="20" text-anchor="middle">cat</text>
+                </svg>
+                <p style="margin-top: 15px; font-size: 0.9em; color: #666;">Tap the animal you hear!</p>
+            </div>
+
+            <!-- Build Word Preview -->
+            <div class="activity-card">
+                <h4>🔤 Word Building</h4>
+                <svg viewBox="0 0 200 200" width="120" height="120" style="margin: 0 auto; display: block;">
+                    <rect x="20" y="30" width="35" height="35" rx="5" fill="#FFAB91"/>
+                    <text x="37.5" y="60" font-size="20" font-weight="bold" text-anchor="middle" fill="white">C</text>
+                    <rect x="65" y="20" width="35" height="35" rx="5" fill="#81C784"/>
+                    <text x="82.5" y="50" font-size="20" font-weight="bold" text-anchor="middle" fill="white">A</text>
+                    <rect x="110" y="30" width="35" height="35" rx="5" fill="#B39DDB"/>
+                    <text x="127.5" y="60" font-size="20" font-weight="bold" text-anchor="middle" fill="white">T</text>
+                    <rect x="40" y="90" width="120" height="40" rx="8" fill="#FFE082" stroke="#333" stroke-width="2"/>
+                    <text x="100" y="120" font-size="18" font-weight="bold" text-anchor="middle" fill="#333">CAT</text>
+                </svg>
+                <p style="margin-top: 15px; font-size: 0.9em; color: #666;">Build the word with letters!</p>
+            </div>
+
+            <!-- Read & Match Preview -->
+            <div class="activity-card">
+                <h4>📖 Word Matching</h4>
+                <svg viewBox="0 0 200 200" width="120" height="120" style="margin: 0 auto; display: block;">
+                    <rect x="20" y="30" width="160" height="120" rx="8" fill="#E8D5F2"/>
+                    <line x1="100" y1="30" x2="100" y2="150" stroke="#999" stroke-width="1"/>
+                    <text x="60" y="70" font-size="14" text-anchor="middle" fill="#333">cat</text>
+                    <text x="60" y="110" font-size="14" text-anchor="middle" fill="#333">dog</text>
+                    <circle cx="140" cy="65" r="12" fill="#FF9800"/>
+                    <circle cx="138" cy="63" r="2" fill="#333"/>
+                    <ellipse cx="145" cy="70" rx="4" ry="6" fill="#FF9800"/>
+                    <ellipse cx="140" cy="75" rx="8" ry="5" fill="#D2691E"/>
+                </svg>
+                <p style="margin-top: 15px; font-size: 0.9em; color: #666;">Tap the matching picture!</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        console.log('🎨 Kids Learning Graphics System Ready!');
+        console.log('These SVG graphics are optimized for:');
+        console.log('✓ Fast loading (no external images)');
+        console.log('✓ Scalable to any size');
+        console.log('✓ Kid-friendly colors');
+        console.log('✓ Engaging animations ready');
+    </script>
+</body>
+</html>
