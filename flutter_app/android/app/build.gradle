@@ -1,8 +1,8 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
 }
+
+apply plugin: "dev.flutter.flutter-gradle-plugin"
 
 android {
     namespace = "com.phonetics.app"
@@ -38,8 +38,4 @@ android {
 
 flutter {
     source = "../.."
-}
-
-dependencies {
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
 }
