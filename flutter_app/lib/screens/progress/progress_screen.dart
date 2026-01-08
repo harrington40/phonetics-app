@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../config/theme.dart';
-import '../providers/providers.dart';
-import '../widgets/reusable_widgets.dart';
+import '../../config/theme.dart';
+import '../../providers/providers.dart';
+import '../../widgets/reusable_widgets.dart';
 
 class ProgressScreen extends ConsumerStatefulWidget {
   @override

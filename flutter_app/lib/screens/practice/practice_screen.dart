@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../config/theme.dart';
-import '../models/models.dart';
-import '../providers/providers.dart';
-import '../widgets/activities.dart';
-import '../widgets/reusable_widgets.dart';
+import '../../config/theme.dart';
+import '../../models/models.dart';
+import '../../providers/providers.dart';
+import '../../widgets/activities.dart';
+import '../../widgets/reusable_widgets.dart';
 
 class PracticeScreen extends ConsumerStatefulWidget {
   @override
@@ -30,8 +30,12 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
 
     final item = session[_currentIndex];
 
-    return WillPopScope(
-      onWillPop: () => _showExitDialog(context),
+    return PopScope(
+      canPop: false,
+      onPopInvoked: (didPop) {
+        if (didPop) return;
+        _showExitDialog(context);
+      },
       child: Scaffold(
         backgroundColor: AppColors.bgLight,
         appBar: AppBar(

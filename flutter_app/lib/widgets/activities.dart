@@ -172,7 +172,7 @@ class _ListenChooseActivityState extends State<ListenChooseActivity> {
                     ),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.1),
+                        color: Colors.black.withValues(alpha: 0.1),
                         blurRadius: 4,
                       ),
                     ],
@@ -264,30 +264,32 @@ class _BuildWordActivityState extends State<BuildWordActivity> {
 
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.lg),
-        ),
-        backgroundColor: AppColors.bgCard,
-        title: Text(
-          correct ? 'Perfect blend! 🎉' : 'Try again! 💪',
-          style: AppTypography.heading2,
-        ),
-        content: Text(
-          correct ? 'You spelled "$word" correctly!' : 'The word is: cat',
-          style: AppTypography.body,
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              widget.onSubmit(hintsUsed, secondsSpent, correct);
-            },
-            child: Text('Continue', style: AppTypography.buttonSmall),
+      builder: (context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
-        ],
-      );
-    });
+          backgroundColor: AppColors.bgCard,
+          title: Text(
+            correct ? 'Perfect blend! 🎉' : 'Try again! 💪',
+            style: AppTypography.heading2,
+          ),
+          content: Text(
+            correct ? 'You spelled "$word" correctly!' : 'The word is: cat',
+            style: AppTypography.body,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+                widget.onSubmit(hintsUsed, secondsSpent, correct);
+              },
+              child: Text('Continue', style: AppTypography.buttonSmall),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
