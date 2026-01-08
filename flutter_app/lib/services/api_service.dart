@@ -56,7 +56,7 @@ class ApiService {
     }
   }
 
-  Future<List<SkillProgress>> getProgress() async {
+  Future<List<SkillProgress>> getSkillProgress() async {
     try {
       final response = await http.get(
         Uri.parse('${ApiConfig.backendUrl}/learning/progress'),

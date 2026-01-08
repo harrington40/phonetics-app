@@ -52,8 +52,3 @@ class SessionNotifier extends StateNotifier<List<SessionItem>> {
     state = state.where((item) => item.id != itemId).toList();
   }
 }
-
-final adminStatsProvider = FutureProvider((ref) async {
-  final apiService = ref.watch(apiServiceProvider);
-  return apiService.getAdminStats();
-});

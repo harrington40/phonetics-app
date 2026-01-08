@@ -285,7 +285,16 @@ class _BuildWordActivityState extends State<BuildWordActivity> {
             },
             child: Text('Continue', style: AppTypography.buttonSmall),
           ),
-        ],Animated graphics
+        ],
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        // Animated graphics
         Padding(
           padding: EdgeInsets.all(AppSpacing.md),
           child: BuildWordGraphic(
@@ -293,7 +302,9 @@ class _BuildWordActivityState extends State<BuildWordActivity> {
             size: Size(280, 240),
           ),
         ),
-        SizedBox(height: AppSpacing.md  child: Container(
+        SizedBox(
+          height: AppSpacing.md,
+          child: Container(
             width: 120,
             height: 120,
             decoration: BoxDecoration(
@@ -441,11 +452,7 @@ class _ReadPickActivityState extends State<ReadPickActivity> {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Word to read
-        Padding(
-          padding: EdgeInsets.all(AppSpacing.lg),
-          child: Container(
-           Animated graphics
+        // Animated graphics
         Padding(
           padding: EdgeInsets.all(AppSpacing.md),
           child: ReadPickGraphic(
@@ -453,7 +460,11 @@ class _ReadPickActivityState extends State<ReadPickActivity> {
           ),
         ),
         SizedBox(height: AppSpacing.md),
-        //  padding: EdgeInsets.all(AppSpacing.md),
+        // Word to read
+        Padding(
+          padding: EdgeInsets.all(AppSpacing.lg),
+          child: Container(
+            padding: EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               gradient: AppColors.cardGradientOrange,
               borderRadius: BorderRadius.circular(AppRadius.lg),
