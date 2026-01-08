@@ -103,8 +103,8 @@ pipeline {
                     # Accept SDK licenses
                     yes | sdkmanager --licenses
                     
-                    # Install required SDK components
-                    sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "cmdline-tools;latest"
+                    # Install required SDK components (Flutter requirements)
+                    sdkmanager "platform-tools" "platforms;android-36" "build-tools;34.0.0" "cmdline-tools;latest"
                     
                     # Verify installation
                     sdkmanager --list_installed
