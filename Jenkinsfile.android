@@ -138,6 +138,7 @@ pipeline {
                         flutter config --android-sdk "$ANDROID_HOME"
                         yes | flutter doctor --android-licenses
                         flutter clean
+                        rm -f .flutter-plugins .flutter-plugins-dependencies
                         flutter pub get
                         flutter pub upgrade
                         flutter doctor -v
