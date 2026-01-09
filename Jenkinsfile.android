@@ -151,6 +151,34 @@ pipeline {
             }
         }
 
+        stage('Validate Dependencies') {
+            steps {
+                dir("${FLUTTER_DIR}") {
+                    echo '=== Validating Flutter dependencies ==='
+                    sh '''
+                        # Check if pubspec.lock exists
+                        if [ ! -f pubspec.lock ]; then
+                            echo "ERROR: pubspec.lock not found"
+                            exit 1
+                        fi
+                        
+                        # Check if .flutter-plugins exists
+                        if [ ! -f .flutter-plugins ]; then
+                            echo "WARNING: .flutter-plugins not found, regenerating..."
+                            flutter pub get
+                        fi
+                        
+                        # Verify key plugins are listed
+                        if ! grep -q "sqflite" .flutter-plugins 2>/dev/null; then
+                            echo "WARNING: sqflite plugin not found in .flutter-plugins"
+                        fi
+                        
+                        echo "Dependencies validation completed"
+                    '''
+                }
+            }
+        }
+
         stage('Code Analysis') {
             steps {
                 dir("${FLUTTER_DIR}") {
@@ -175,34 +203,38 @@ pipeline {
 
         stage('Build APK') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Building Android APK ==='
-                    sh '''
-                        echo "=== DEBUG INFO ==="
-                        echo "Flutter: $(which flutter)"
-                        echo "Flutter version: $(flutter --version | head -1)"
-                        echo "Android SDK: $ANDROID_HOME"
-                        echo "PATH: $PATH"
-                        echo "=================="
-                        
-                        flutter build apk --release --split-per-abi --verbose
-                        
-                        echo "APK files created:"
-                        ls -lh build/app/outputs/flutter-apk/
-                    '''
+                retry(2) {
+                    dir("${FLUTTER_DIR}") {
+                        echo '=== Building Android APK ==='
+                        sh '''
+                            echo "=== DEBUG INFO ==="
+                            echo "Flutter: $(which flutter)"
+                            echo "Flutter version: $(flutter --version | head -1)"
+                            echo "Android SDK: $ANDROID_HOME"
+                            echo "PATH: $PATH"
+                            echo "=================="
+                            
+                            flutter build apk --release --split-per-abi --verbose
+                            
+                            echo "APK files created:"
+                            ls -lh build/app/outputs/flutter-apk/
+                        '''
+                    }
                 }
             }
         }
 
         stage('Build AAB') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Building Android App Bundle ==='
-                    sh '''
-                        flutter build appbundle --release
-                        echo "AAB file created:"
-                        ls -lh build/app/outputs/bundle/release/
-                    '''
+                retry(2) {
+                    dir("${FLUTTER_DIR}") {
+                        echo '=== Building Android App Bundle ==='
+                        sh '''
+                            flutter build appbundle --release
+                            echo "AAB file created:"
+                            ls -lh build/app/outputs/bundle/release/
+                        '''
+                    }
                 }
             }
         }
