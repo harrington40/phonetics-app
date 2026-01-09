@@ -1,8 +1,7 @@
-/*
- * Phonetics Learning App - Android Build Pipeline
- * Builds and deploys Android APK/AAB
- */
+Complete Fixed Jenkinsfile
+Here's the complete corrected version with all fixes applied:
 
+groovy
 pipeline {
     agent any
 
@@ -16,11 +15,11 @@ pipeline {
     environment {
         PROJECT_NAME = "phonetics-app-android"
         FLUTTER_DIR = "flutter_app"
-        FLUTTER_HOME = "${HOME}/flutter"
-        PATH = "${HOME}/flutter/bin:${PATH}"
-        FLUTTER_VERSION = "3.16.0"
         BUILD_TYPE = "release"
         OUTPUT_DIR = "build/app/outputs"
+        ANDROID_HOME = "${HOME}/android-sdk"
+        FLUTTER_HOME = "${HOME}/flutter"
+        PATH = "${HOME}/flutter/bin:${HOME}/android-sdk/cmdline-tools/latest/bin:${HOME}/android-sdk/platform-tools:${env.PATH}"
     }
 
     triggers {
@@ -57,17 +56,6 @@ pipeline {
                     sudo apt-get update -qq
                     sudo apt-get install -y -qq unzip curl git xz-utils zip libglu1-mesa
                     
-                    # Install Chrome for web development
-                    echo "Installing Google Chrome..."
-                    wget -q -O - https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
-                    echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
-                    sudo apt-get update -qq
-                    sudo apt-get install -y -qq google-chrome-stable
-                    
-                    # Install Linux development tools
-                    echo "Installing Linux development tools..."
-                    sudo apt-get install -y -qq clang cmake ninja-build pkg-config libgtk-3-dev
-                    
                     # Setup Flutter
                     FLUTTER_HOME="$HOME/flutter"
                     
@@ -77,8 +65,8 @@ pipeline {
                         git clone https://github.com/flutter/flutter.git -b stable "$FLUTTER_HOME"
                     fi
                     
-                    # Add to PATH
-                    export PATH="$PATH:$FLUTTER_HOME/bin"
+                    # Export PATH for this stage
+                    export PATH="$FLUTTER_HOME/bin:$PATH"
                     
                     flutter --version
                     flutter doctor -v
@@ -90,9 +78,6 @@ pipeline {
             steps {
                 echo '=== Setting up Android SDK ==='
                 sh '''
-                    # Install Android SDK Command Line Tools
-                    echo "Installing Android SDK..."
-                    
                     # Create Android SDK directory
                     ANDROID_HOME="$HOME/android-sdk"
                     mkdir -p "$ANDROID_HOME"
@@ -101,12 +86,8 @@ pipeline {
                     # Check if SDK is already installed
                     if [ ! -d "$ANDROID_HOME/cmdline-tools/latest" ]; then
                         echo "Downloading Android SDK Command Line Tools..."
-                        
-                        # Download Android SDK Command Line Tools
                         CMDLINE_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
                         wget -q "$CMDLINE_TOOLS_URL" -O cmdline-tools.zip
-                        
-                        # Extract to cmdline-tools/latest
                         unzip -q cmdline-tools.zip
                         mv cmdline-tools "$ANDROID_HOME/cmdline-tools/latest"
                         rm cmdline-tools.zip
@@ -114,18 +95,11 @@ pipeline {
                         echo "Android SDK already installed, skipping download"
                     fi
                     
-                    # Add to PATH
-                    export ANDROID_HOME="$HOME/android-sdk"
-                    export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools"
-                    
                     # Accept SDK licenses
                     yes | sdkmanager --licenses
                     
-                    # Install required SDK components (Flutter requirements)
+                    # Install required SDK components
                     sdkmanager "platform-tools" "platforms;android-36" "build-tools;34.0.0" "cmdline-tools;latest"
-                    
-                    # Verify installation
-                    sdkmanager --list_installed
                     
                     echo "Android SDK setup complete"
                 '''
@@ -137,18 +111,11 @@ pipeline {
                 dir("${FLUTTER_DIR}") {
                     echo '=== Installing Flutter dependencies ==='
                     sh '''
-                        export ANDROID_HOME="$HOME/android-sdk"
-                        export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$HOME/flutter/bin"
-                        
                         flutter config --android-sdk "$ANDROID_HOME"
-                        
-                        # Accept Android licenses
-                        yes | flutter doctor --android-licenses || true
-                        
+                        yes | flutter doctor --android-licenses
                         flutter clean
                         flutter pub get
                         flutter pub upgrade
-                        
                         flutter doctor -v
                     '''
                 }
@@ -182,10 +149,14 @@ pipeline {
                 dir("${FLUTTER_DIR}") {
                     echo '=== Building Android APK ==='
                     sh '''
-                        export ANDROID_HOME="$HOME/android-sdk"
-                        export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$HOME/flutter/bin"
+                        echo "=== DEBUG INFO ==="
+                        echo "Flutter: $(which flutter)"
+                        echo "Flutter version: $(flutter --version | head -1)"
+                        echo "Android SDK: $ANDROID_HOME"
+                        echo "PATH: $PATH"
+                        echo "=================="
                         
-                        flutter build apk --release --split-per-abi
+                        flutter build apk --release --split-per-abi --verbose
                         
                         echo "APK files created:"
                         ls -lh build/app/outputs/flutter-apk/
@@ -199,11 +170,7 @@ pipeline {
                 dir("${FLUTTER_DIR}") {
                     echo '=== Building Android App Bundle ==='
                     sh '''
-                        export ANDROID_HOME="$HOME/android-sdk"
-                        export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$HOME/flutter/bin"
-                        
                         flutter build appbundle --release
-                        
                         echo "AAB file created:"
                         ls -lh build/app/outputs/bundle/release/
                     '''
@@ -219,29 +186,11 @@ pipeline {
                         mkdir -p ../artifacts/android
                         cp -r build/app/outputs/flutter-apk/*.apk ../artifacts/android/ || true
                         cp build/app/outputs/bundle/release/*.aab ../artifacts/android/ || true
-                        
                         echo "Artifacts:"
                         ls -lh ../artifacts/android/
                     '''
                 }
                 archiveArtifacts artifacts: 'artifacts/android/*.apk, artifacts/android/*.aab', allowEmptyArchive: false
-            }
-        }
-
-        stage('Deploy to Firebase') {
-            when {
-                branch 'main'
-            }
-            steps {
-                echo '=== Deploying to Firebase App Distribution ==='
-                sh '''
-                    # Uncomment when Firebase CLI is configured
-                    # firebase appdistribution:distribute artifacts/android/app-release.apk \
-                    #   --app YOUR_FIREBASE_APP_ID \
-                    #   --groups testers
-                    
-                    echo "Note: Firebase deployment commented out. Configure to enable."
-                '''
             }
         }
     }
@@ -264,7 +213,6 @@ Artifacts: APK, AAB
 EOF
                 cat build-status-android.txt
             '''
-            archiveArtifacts artifacts: 'build-status-android.txt', allowEmptyArchive: true
         }
 
         failure {
