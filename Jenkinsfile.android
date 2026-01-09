@@ -16,6 +16,7 @@ pipeline {
         ANDROID_HOME = "${HOME}/android-sdk"
         JAVA_HOME = "/usr/lib/jvm/java-17-openjdk-amd64"
         FLUTTER_HOME = "${HOME}/flutter"
+        GRADLE_USER_HOME = "${WORKSPACE}/gradle_cache"
         PATH = "${JAVA_HOME}/bin:${HOME}/flutter/bin:${HOME}/android-sdk/cmdline-tools/latest/bin:${HOME}/android-sdk/platform-tools:${env.PATH}"
     }
 
@@ -97,6 +98,9 @@ pipeline {
                     
                     # Install required SDK components
                     sdkmanager "platform-tools" "platforms;android-36" "build-tools;34.0.0" "cmdline-tools;latest"
+                    
+                    # Create Gradle cache directory
+                    mkdir -p "${WORKSPACE}/gradle_cache"
                     
                     echo "Android SDK setup complete"
                 '''
