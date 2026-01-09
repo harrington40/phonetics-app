@@ -1,7 +1,3 @@
-Complete Fixed Jenkinsfile
-Here's the complete corrected version with all fixes applied:
-
-groovy
 pipeline {
     agent any
 
