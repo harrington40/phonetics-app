@@ -23,12 +23,12 @@ dependencies:
 
   # Networking & Local Storage
   http: ^1.1.0
-  sqflite: ^2.3.0
-  path_provider: ^2.1.0
+  sqflite: ^2.3.3
+  path_provider: ^2.1.3
 
   # Audio
-  just_audio: ^0.9.30
-  audio_session: ^0.1.13
+  just_audio: ^0.9.36
+  audio_session: ^0.1.14
 
   # Utilities
   uuid: ^4.0.0
