@@ -56,4 +56,8 @@ flutter {
 dependencies {
     implementation 'androidx.annotation:annotation:1.7.0'
     implementation 'io.flutter:flutter_embedding_release:1.0.0-1527ae0ec577a4ef50e65f6fefcfc1326707d9bf'
+    implementation 'com.tekartik.sqflite:sqflite:2.3.0'
+    implementation 'io.flutter.plugins.pathprovider:path_provider:2.1.0'
+    implementation 'com.ryanheise.just_audio:just_audio:0.9.30'
+    implementation 'com.ryanheise.audio_session:audio_session:0.1.13'
 }
