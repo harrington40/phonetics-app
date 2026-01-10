@@ -18,36 +18,21 @@ dependencies:
 
   # UI & Animation
   flutter_animate: ^4.2.0
-  google_fonts: ^6.1.0
+  google_fonts: ^5.1.0
   intl: ^0.19.0
 
   # Networking & Local Storage
   http: ^1.1.0
-  sqflite:
-    path: ../flutter_plugins/sqflite/sqflite
-  path_provider:
-    path: ../flutter_plugins/plugins/packages/path_provider/path_provider
+  sqflite: ^2.3.0
+  path_provider: ^2.1.0
 
   # Audio
-  just_audio:
-    path: ../flutter_plugins/just_audio/just_audio
-  audio_session:
-    path: ../flutter_plugins/audio_session
+  just_audio: ^0.9.36
+  audio_session: ^0.1.14
 
   # Utilities
   uuid: ^4.0.0
 
-dependency_overrides:
-  path_provider:
-    path: ../flutter_plugins/plugins/packages/path_provider/path_provider
-  path_provider_android:
-    path: ../flutter_plugins/plugins/packages/path_provider/path_provider_android
-  audio_session:
-    path: ../flutter_plugins/audio_session
-  sqflite:
-    path: ../flutter_plugins/sqflite/sqflite
-  sqflite_android:
-    path: ../flutter_plugins/sqflite/sqflite_android
 
 dev_dependencies:
   flutter_test:

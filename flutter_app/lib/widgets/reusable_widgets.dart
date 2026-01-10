@@ -22,7 +22,7 @@ class BigPrimaryButton extends StatelessWidget {
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.primaryPastel,
-          disabledBackgroundColor: AppColors.primaryPastel.withValues(alpha: 0.5),
+          disabledBackgroundColor: AppColors.primaryPastel.withOpacity(0.5),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppRadius.lg),
           ),
@@ -63,7 +63,7 @@ class SoftCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
+            color: Colors.black.withOpacity(0.05),
             blurRadius: 8,
             offset: Offset(0, 2),
           ),
@@ -133,7 +133,7 @@ class _LetterTileState extends State<LetterTile>
             borderRadius: BorderRadius.circular(AppRadius.md),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.1),
+                color: Colors.black.withOpacity(0.1),
                 blurRadius: 4,
                 offset: Offset(0, 2),
               ),
@@ -177,7 +177,7 @@ class ProgressDots extends StatelessWidget {
             shape: BoxShape.circle,
             color: index < current
                 ? AppColors.primaryPastel
-                : AppColors.primaryPastel.withValues(alpha: 0.3),
+                : AppColors.primaryPastel.withOpacity(0.3),
           ),
         ),
       ),
@@ -315,7 +315,7 @@ class MasteryPlant extends StatelessWidget {
               child: LinearProgressIndicator(
                 value: mastery,
                 minHeight: 4,
-                backgroundColor: Colors.white.withValues(alpha: 0.5),
+                backgroundColor: Colors.white.withOpacity(0.5),
                 valueColor:
                     AlwaysStoppedAnimation<Color>(AppColors.secondaryPastel),
               ),

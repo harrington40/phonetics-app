@@ -32,7 +32,7 @@ class _PracticeScreenState extends ConsumerState<PracticeScreen> {
 
     return PopScope(
       canPop: false,
-      onPopInvokedWithResult: (didPop, result) {
+      onPopInvoked: (didPop) {
         if (didPop) return;
         _showExitDialog(context);
       },

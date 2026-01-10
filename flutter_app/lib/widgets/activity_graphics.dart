@@ -84,7 +84,7 @@ class ListenChoosePainter extends CustomPainter {
     final paint = Paint();
 
     // Background circle
-    paint.color = primaryColor.withValues(alpha: 0.1);
+    paint.color = primaryColor.withOpacity(0.1);
     canvas.drawCircle(center, 120, paint);
 
     // Happy character face
@@ -117,7 +117,7 @@ class ListenChoosePainter extends CustomPainter {
     for (int i = 1; i <= 2; i++) {
       final radius = 20.0 + (i * 15.0) + (animation.value * 30.0);
       final opacity = math.max(0.0, 0.8 - (animation.value * 1.0) - (i * 0.2));
-      paint.color = secondaryColor.withValues(alpha: opacity.toDouble());
+      paint.color = secondaryColor.withOpacity(opacity.toDouble());
       canvas.drawCircle(
         Offset(center.dx, center.dy + 40),
         radius.toDouble(),
@@ -242,7 +242,7 @@ class BuildWordPainter extends CustomPainter {
     final paint = Paint();
 
     // Background circle
-    paint.color = secondaryColor.withValues(alpha: 0.1);
+    paint.color = secondaryColor.withOpacity(0.1);
     canvas.drawCircle(Offset(size.width / 2, size.height / 2), 120, paint);
 
     // Builder character
@@ -398,7 +398,7 @@ class ReadPickPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2.5);
 
     // Background circle
-    paint.color = warningColor.withValues(alpha: 0.1);
+    paint.color = warningColor.withOpacity(0.1);
     canvas.drawCircle(center, 120, paint);
 
     // Reading character
@@ -542,7 +542,7 @@ class RewardPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2.5);
 
     // Background circle
-    paint.color = goldColor.withValues(alpha: 0.1);
+    paint.color = goldColor.withOpacity(0.1);
     canvas.drawCircle(center, 120, paint);
 
     // Celebrating character
@@ -716,7 +716,7 @@ class ProgressPlantPainter extends CustomPainter {
     final stage = (masteryPercent / 33).floor().clamp(0, 3);
 
     // Background
-    paint.color = secondaryColor.withValues(alpha: 0.1);
+    paint.color = secondaryColor.withOpacity(0.1);
     canvas.drawCircle(Offset(size.width / 2, size.height / 2), 120, paint);
 
     // Soil

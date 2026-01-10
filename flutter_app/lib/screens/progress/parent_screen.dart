@@ -110,7 +110,6 @@ class _ParentScreenState extends ConsumerState<ParentScreen> {
                         setState(() => _allowSpeechMode = val);
                         _updateSettings();
                       },
-                      activeThumbColor: AppColors.primaryPastel,
                     ),
                     SizedBox(height: AppSpacing.md),
                     // Dyslexia-friendly font
@@ -122,7 +121,6 @@ class _ParentScreenState extends ConsumerState<ParentScreen> {
                         setState(() => _dislexiaFriendlyFont = val);
                         _updateSettings();
                       },
-                      activeThumbColor: AppColors.primaryPastel,
                     ),
                   ],
                 ),

@@ -25,8 +25,8 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFFE1BEE7).withValues(alpha: 0.5),
-      Color(0xFFB39DDB).withValues(alpha: 0.3),
+      Color(0xFFE1BEE7).withOpacity(0.5),
+      Color(0xFFB39DDB).withOpacity(0.3),
     ],
   );
 
@@ -34,8 +34,8 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFFC8E6C9).withValues(alpha: 0.5),
-      Color(0xFF81C784).withValues(alpha: 0.3),
+      Color(0xFFC8E6C9).withOpacity(0.5),
+      Color(0xFF81C784).withOpacity(0.3),
     ],
   );
 
@@ -43,8 +43,8 @@ class AppColors {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFFFFCCBC).withValues(alpha: 0.5),
-      Color(0xFFFFAB91).withValues(alpha: 0.3),
+      Color(0xFFFFCCBC).withOpacity(0.5),
+      Color(0xFFFFAB91).withOpacity(0.3),
     ],
   );
 }
