@@ -1,3 +1,8 @@
+/*
+ * Phonetics Learning App - Android Build Pipeline
+ * React Native Architecture
+ */
+
 pipeline {
     agent any
 
@@ -10,14 +15,14 @@ pipeline {
 
     environment {
         PROJECT_NAME = "phonetics-app-android"
-        FLUTTER_DIR = "flutter_app"
+        MOBILE_DIR = "react-native-mobile"
         BUILD_TYPE = "release"
-        OUTPUT_DIR = "build/app/outputs"
+        OUTPUT_DIR = "android/app/build/outputs"
         ANDROID_HOME = "${HOME}/android-sdk"
         JAVA_HOME = "/usr/lib/jvm/java-17-openjdk-amd64"
-        FLUTTER_HOME = "${HOME}/flutter"
+        NODE_VERSION = "18"
         GRADLE_USER_HOME = "${WORKSPACE}/gradle_cache"
-        PATH = "${JAVA_HOME}/bin:${HOME}/flutter/bin:${HOME}/android-sdk/cmdline-tools/latest/bin:${HOME}/android-sdk/platform-tools:${env.PATH}"
+        PATH = "${JAVA_HOME}/bin:${HOME}/android-sdk/cmdline-tools/latest/bin:${HOME}/android-sdk/platform-tools:${env.PATH}"
     }
 
     triggers {
@@ -33,7 +38,7 @@ pipeline {
                 echo "Build: ${env.BUILD_NUMBER}"
                 sh '''
                     pwd
-                    ls -la flutter_app/
+                    ls -la react-native-mobile/ || echo "react-native-mobile/ not found"
                 '''
             }
         }
@@ -45,29 +50,19 @@ pipeline {
             }
         }
 
-        stage('Setup Flutter') {
+        stage('Setup Node.js') {
             steps {
-                echo '=== Setting up Flutter ==='
+                echo '=== Setting up Node.js ==='
                 sh '''
-                    # Install required system dependencies
-                    echo "Installing system dependencies..."
-                    sudo apt-get update -qq
-                    sudo apt-get install -y -qq unzip curl git xz-utils zip libglu1-mesa
-                    
-                    # Setup Flutter
-                    FLUTTER_HOME="$HOME/flutter"
-                    
-                    # Check if Flutter is installed
-                    if [ ! -d "$FLUTTER_HOME" ]; then
-                        echo "Flutter not found. Installing..."
-                        git clone https://github.com/flutter/flutter.git -b stable "$FLUTTER_HOME"
+                    # Install Node.js if not present
+                    if ! command -v node &> /dev/null || ! node --version | grep -q "v18"; then
+                        echo "Installing Node.js 18..."
+                        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+                        sudo apt-get install -y nodejs
                     fi
                     
-                    # Export PATH for this stage
-                    export PATH="$FLUTTER_HOME/bin:$PATH"
-                    
-                    flutter --version
-                    flutter doctor -v
+                    echo "Node version: $(node --version)"
+                    echo "npm version: $(npm --version)"
                 '''
             }
         }
@@ -97,7 +92,7 @@ pipeline {
                     yes | sdkmanager --licenses
                     
                     # Install required SDK components
-                    sdkmanager "platform-tools" "platforms;android-36" "build-tools;34.0.0" "cmdline-tools;latest"
+                    sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" "cmdline-tools;latest"
                     
                     # Create Gradle cache directory
                     mkdir -p "${WORKSPACE}/gradle_cache"
@@ -127,25 +122,17 @@ pipeline {
                     echo "JAVA_HOME: $JAVA_HOME"
                     echo "Java version:"
                     java -version
-                    echo "Jlink location:"
-                    which jlink
-                    ls -la /usr/lib/jvm/java-17-openjdk-amd64/bin/jlink
                 '''
             }
         }
 
-        stage('Flutter Dependencies') {
+        stage('Install Dependencies') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Installing Flutter dependencies ==='
+                dir("${MOBILE_DIR}") {
+                    echo '=== Installing npm dependencies ==='
                     sh '''
-                        flutter config --android-sdk "$ANDROID_HOME"
-                        yes | flutter doctor --android-licenses
-                        flutter clean
-                        rm -f .flutter-plugins .flutter-plugins-dependencies
-                        flutter pub get
-                        flutter pub upgrade
-                        flutter doctor -v
+                        npm ci
+                        echo "Dependencies installed successfully"
                     '''
                 }
             }
@@ -153,24 +140,19 @@ pipeline {
 
         stage('Validate Dependencies') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Validating Flutter dependencies ==='
+                dir("${MOBILE_DIR}") {
+                    echo '=== Validating React Native dependencies ==='
                     sh '''
-                        # Check if pubspec.lock exists
-                        if [ ! -f pubspec.lock ]; then
-                            echo "ERROR: pubspec.lock not found"
+                        # Check if node_modules exists
+                        if [ ! -d "node_modules" ]; then
+                            echo "ERROR: node_modules not found"
                             exit 1
                         fi
                         
-                        # Check if .flutter-plugins exists
-                        if [ ! -f .flutter-plugins ]; then
-                            echo "WARNING: .flutter-plugins not found, regenerating..."
-                            flutter pub get
-                        fi
-                        
-                        # Verify key plugins are listed
-                        if ! grep -q "sqflite" .flutter-plugins 2>/dev/null; then
-                            echo "WARNING: sqflite plugin not found in .flutter-plugins"
+                        # Check if package-lock.json exists
+                        if [ ! -f "package-lock.json" ]; then
+                            echo "ERROR: package-lock.json not found"
+                            exit 1
                         fi
                         
                         echo "Dependencies validation completed"
@@ -179,12 +161,12 @@ pipeline {
             }
         }
 
-        stage('Code Analysis') {
+        stage('Lint Code') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Running Flutter analyze ==='
+                dir("${MOBILE_DIR}") {
+                    echo '=== Running ESLint ==='
                     sh '''
-                        flutter analyze || echo "WARNING: Analysis found issues"
+                        npm run lint || echo "WARNING: Linting found issues"
                     '''
                 }
             }
@@ -192,10 +174,10 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Running Flutter tests ==='
+                dir("${MOBILE_DIR}") {
+                    echo '=== Running Jest tests ==='
                     sh '''
-                        flutter test || echo "WARNING: Tests failed"
+                        npm test -- --ci --coverage || echo "WARNING: Tests failed"
                     '''
                 }
             }
@@ -204,20 +186,25 @@ pipeline {
         stage('Build APK') {
             steps {
                 retry(2) {
-                    dir("${FLUTTER_DIR}") {
+                    dir("${MOBILE_DIR}/android") {
                         echo '=== Building Android APK ==='
                         sh '''
                             echo "=== DEBUG INFO ==="
-                            echo "Flutter: $(which flutter)"
-                            echo "Flutter version: $(flutter --version | head -1)"
+                            echo "Node: $(node --version)"
+                            echo "npm: $(npm --version)"
                             echo "Android SDK: $ANDROID_HOME"
+                            echo "Java: $(java -version 2>&1 | head -1)"
                             echo "PATH: $PATH"
                             echo "=================="
                             
-                            flutter build apk --release --split-per-abi --verbose
+                            # Clean previous builds
+                            ./gradlew clean
+                            
+                            # Build release APK
+                            ./gradlew assembleRelease --no-daemon --stacktrace
                             
                             echo "APK files created:"
-                            ls -lh build/app/outputs/flutter-apk/
+                            ls -lh app/build/outputs/apk/release/
                         '''
                     }
                 }
@@ -227,12 +214,14 @@ pipeline {
         stage('Build AAB') {
             steps {
                 retry(2) {
-                    dir("${FLUTTER_DIR}") {
+                    dir("${MOBILE_DIR}/android") {
                         echo '=== Building Android App Bundle ==='
                         sh '''
-                            flutter build appbundle --release
+                            # Build release AAB
+                            ./gradlew bundleRelease --no-daemon --stacktrace
+                            
                             echo "AAB file created:"
-                            ls -lh build/app/outputs/bundle/release/
+                            ls -lh app/build/outputs/bundle/release/
                         '''
                     }
                 }
@@ -242,11 +231,11 @@ pipeline {
         stage('Archive Artifacts') {
             steps {
                 echo '=== Archiving build artifacts ==='
-                dir("${FLUTTER_DIR}") {
+                dir("${MOBILE_DIR}") {
                     sh '''
                         mkdir -p ../artifacts/android
-                        cp -r build/app/outputs/flutter-apk/*.apk ../artifacts/android/ || true
-                        cp build/app/outputs/bundle/release/*.aab ../artifacts/android/ || true
+                        cp android/app/build/outputs/apk/release/*.apk ../artifacts/android/ || true
+                        cp android/app/build/outputs/bundle/release/*.aab ../artifacts/android/ || true
                         echo "Artifacts:"
                         ls -lh ../artifacts/android/
                     '''
@@ -266,7 +255,7 @@ pipeline {
             sh '''
                 cat > build-status-android.txt << EOF
 Build Status: SUCCESS
-Platform: Android
+Platform: Android (React Native)
 Build Number: ${BUILD_NUMBER}
 Branch: ${BRANCH_NAME}
 Timestamp: $(date)
@@ -281,7 +270,7 @@ EOF
             sh '''
                 cat > build-status-android.txt << EOF
 Build Status: FAILURE
-Platform: Android
+Platform: Android (React Native)
 Build Number: ${BUILD_NUMBER}
 Branch: ${BRANCH_NAME}
 Timestamp: $(date)
@@ -293,8 +282,8 @@ EOF
         cleanup {
             echo '=== Cleaning Up ==='
             sh '''
-                cd flutter_app
-                flutter clean || true
+                cd react-native-mobile/android
+                ./gradlew clean || true
             '''
         }
     }

@@ -1,5 +1,6 @@
 /*
  * Phonetics Learning App - iOS Build Pipeline
+ * React Native Architecture
  * Builds and deploys iOS IPA
  * NOTE: Requires macOS agent with Xcode installed
  */
@@ -19,10 +20,10 @@ pipeline {
 
     environment {
         PROJECT_NAME = "phonetics-app-ios"
-        FLUTTER_DIR = "flutter_app"
-        FLUTTER_VERSION = "3.16.0"
+        MOBILE_DIR = "react-native-mobile"
+        NODE_VERSION = "18"
         BUILD_TYPE = "release"
-        IOS_SCHEME = "Runner"
+        IOS_SCHEME = "PhoneticsApp"
     }
 
     triggers {
@@ -64,41 +65,40 @@ pipeline {
             }
         }
 
-        stage('Setup Flutter') {
+        stage('Setup Node.js') {
             steps {
-                echo '=== Setting up Flutter ==='
+                echo '=== Setting up Node.js ==='
                 sh '''
-                    # Check if Flutter is installed
-                    if ! command -v flutter &> /dev/null; then
-                        echo "Flutter not found. Please install Flutter on macOS agent"
-                        exit 1
+                    # Check if Node.js is installed
+                    if ! command -v node &> /dev/null; then
+                        echo "Installing Node.js 18..."
+                        brew install node@18
                     fi
                     
-                    flutter --version
-                    flutter doctor -v
+                    echo "Node version: $(node --version)"
+                    echo "npm version: $(npm --version)"
                 '''
             }
         }
 
-        stage('Flutter Dependencies') {
+        stage('Install Dependencies') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Installing Flutter dependencies ==='
+                dir("${MOBILE_DIR}") {
+                    echo '=== Installing npm dependencies ==='
                     sh '''
-                        flutter clean
-                        flutter pub get
-                        flutter pub upgrade
+                        npm ci
+                        echo "Dependencies installed successfully"
                     '''
                 }
             }
         }
 
-        stage('Code Analysis') {
+        stage('Lint Code') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Running Flutter analyze ==='
+                dir("${MOBILE_DIR}") {
+                    echo '=== Running ESLint ==='
                     sh '''
-                        flutter analyze || echo "WARNING: Analysis found issues"
+                        npm run lint || echo "WARNING: Linting found issues"
                     '''
                 }
             }
@@ -106,10 +106,10 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Running Flutter tests ==='
+                dir("${MOBILE_DIR}") {
+                    echo '=== Running Jest tests ==='
                     sh '''
-                        flutter test || echo "WARNING: Tests failed"
+                        npm test -- --ci --coverage || echo "WARNING: Tests failed"
                     '''
                 }
             }
@@ -117,8 +117,8 @@ pipeline {
 
         stage('Setup iOS Certificates') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Setting up iOS certificates ==='
+                dir("${MOBILE_DIR}") {
+                    echo '=== Setting up iOS certificates and CocoaPods ==='
                     sh '''
                         # Install CocoaPods dependencies
                         cd ios
@@ -133,18 +133,22 @@ pipeline {
 
         stage('Build iOS') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Building iOS IPA ==='
+                dir("${MOBILE_DIR}") {
+                    echo '=== Building iOS app ==='
                     sh '''
-                        # Build iOS app
-                        flutter build ios --release --no-codesign
-                        
-                        # Or with codesigning (requires certificates):
-                        # flutter build ipa --release
+                        # Build iOS app without codesigning (for testing)
+                        cd ios
+                        xcodebuild -workspace PhoneticsApp.xcworkspace \
+                            -scheme PhoneticsApp \
+                            -configuration Release \
+                            -sdk iphoneos \
+                            CODE_SIGN_IDENTITY="" \
+                            CODE_SIGNING_REQUIRED=NO \
+                            CODE_SIGNING_ALLOWED=NO \
+                            build
                         
                         echo "iOS build completed"
-                        ls -lh build/ios/iphoneos/ || true
-                        ls -lh build/ios/archive/ || true
+                        ls -lh build/Build/Products/Release-iphoneos/ || true
                     '''
                 }
             }
@@ -155,11 +159,23 @@ pipeline {
                 branch 'main'
             }
             steps {
-                dir("${FLUTTER_DIR}") {
+                dir("${MOBILE_DIR}") {
                     echo '=== Building signed IPA ==='
                     sh '''
                         # This requires proper certificates and provisioning profiles
-                        # flutter build ipa --release --export-options-plist=ios/ExportOptions.plist
+                        cd ios
+                        xcodebuild -workspace PhoneticsApp.xcworkspace \
+                            -scheme PhoneticsApp \
+                            -configuration Release \
+                            -sdk iphoneos \
+                            -archivePath build/PhoneticsApp.xcarchive \
+                            archive
+                        
+                        # Export IPA
+                        xcodebuild -exportArchive \
+                            -archivePath build/PhoneticsApp.xcarchive \
+                            -exportPath build/ipa \
+                            -exportOptionsPlist ExportOptions.plist
                         
                         echo "Note: Signed IPA build requires certificates configuration"
                     '''
@@ -170,17 +186,17 @@ pipeline {
         stage('Archive Artifacts') {
             steps {
                 echo '=== Archiving build artifacts ==='
-                dir("${FLUTTER_DIR}") {
+                dir("${MOBILE_DIR}") {
                     sh '''
                         mkdir -p ../artifacts/ios
                         
                         # Copy .app bundle or .ipa file
-                        if [ -d "build/ios/iphoneos/Runner.app" ]; then
-                            cp -r build/ios/iphoneos/Runner.app ../artifacts/ios/
+                        if [ -d "ios/build/Build/Products/Release-iphoneos/PhoneticsApp.app" ]; then
+                            cp -r ios/build/Build/Products/Release-iphoneos/PhoneticsApp.app ../artifacts/ios/
                         fi
                         
-                        if [ -f "build/ios/ipa/*.ipa" ]; then
-                            cp build/ios/ipa/*.ipa ../artifacts/ios/
+                        if [ -f "ios/build/ipa/PhoneticsApp.ipa" ]; then
+                            cp ios/build/ipa/PhoneticsApp.ipa ../artifacts/ios/
                         fi
                         
                         echo "Artifacts:"
@@ -218,7 +234,7 @@ pipeline {
             sh '''
                 cat > build-status-ios.txt << EOF
 Build Status: SUCCESS
-Platform: iOS
+Platform: iOS (React Native)
 Build Number: ${BUILD_NUMBER}
 Branch: ${BRANCH_NAME}
 Timestamp: $(date)
@@ -234,7 +250,7 @@ EOF
             sh '''
                 cat > build-status-ios.txt << EOF
 Build Status: FAILURE
-Platform: iOS
+Platform: iOS (React Native)
 Build Number: ${BUILD_NUMBER}
 Branch: ${BRANCH_NAME}
 Timestamp: $(date)
@@ -246,8 +262,9 @@ EOF
         cleanup {
             echo '=== Cleaning Up ==='
             sh '''
-                cd flutter_app
-                flutter clean || true
+                cd react-native-mobile/ios
+                xcodebuild clean || true
+                rm -rf build/ || true
             '''
         }
     }

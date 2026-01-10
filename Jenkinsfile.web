@@ -1,6 +1,9 @@
 /*
  * Phonetics Learning App - Web Build Pipeline
- * Builds and deploys Flutter web app
+ * React Web Application
+ * 
+ * NOTE: The main Jenkinsfile now handles web builds.
+ * This pipeline is kept for standalone web-only builds if needed.
  */
 
 pipeline {
@@ -15,10 +18,10 @@ pipeline {
 
     environment {
         PROJECT_NAME = "phonetics-app-web"
-        FLUTTER_DIR = "flutter_app"
-        FLUTTER_VERSION = "3.16.0"
-        BUILD_TYPE = "release"
-        WEB_OUTPUT = "build/web"
+        WEB_DIR = "react-web"
+        NODE_VERSION = "18"
+        BUILD_TYPE = "production"
+        WEB_OUTPUT = "dist"
     }
 
     triggers {
@@ -34,7 +37,7 @@ pipeline {
                 echo "Build: ${env.BUILD_NUMBER}"
                 sh '''
                     pwd
-                    ls -la flutter_app/
+                    ls -la react-web/
                 '''
             }
         }
@@ -46,45 +49,41 @@ pipeline {
             }
         }
 
-        stage('Setup Flutter') {
+        stage('Setup Node.js') {
             steps {
-                echo '=== Setting up Flutter ==='
+                echo '=== Setting up Node.js ==='
                 sh '''
-                    # Check if Flutter is installed
-                    if ! command -v flutter &> /dev/null; then
-                        echo "Flutter not found. Installing..."
-                        git clone https://github.com/flutter/flutter.git -b stable /opt/flutter
-                        export PATH="$PATH:/opt/flutter/bin"
+                    # Check Node.js version
+                    if ! command -v node &> /dev/null || ! node --version | grep -q "v18"; then
+                        echo "Installing Node.js 18..."
+                        curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
+                        sudo apt-get install -y nodejs
                     fi
                     
-                    # Enable web support
-                    flutter config --enable-web
-                    
-                    flutter --version
-                    flutter doctor -v
+                    echo "Node version: $(node --version)"
+                    echo "npm version: $(npm --version)"
                 '''
             }
         }
 
-        stage('Flutter Dependencies') {
+        stage('Install Dependencies') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Installing Flutter dependencies ==='
+                dir("${WEB_DIR}") {
+                    echo '=== Installing npm dependencies ==='
                     sh '''
-                        flutter clean
-                        flutter pub get
-                        flutter pub upgrade
+                        npm ci
+                        echo "Dependencies installed"
                     '''
                 }
             }
         }
 
-        stage('Code Analysis') {
+        stage('Lint Code') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Running Flutter analyze ==='
+                dir("${WEB_DIR}") {
+                    echo '=== Running ESLint ==='
                     sh '''
-                        flutter analyze || echo "WARNING: Analysis found issues"
+                        npm run lint || echo "WARNING: Linting found issues"
                     '''
                 }
             }
@@ -92,10 +91,10 @@ pipeline {
 
         stage('Run Tests') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Running Flutter tests ==='
+                dir("${WEB_DIR}") {
+                    echo '=== Running tests ==='
                     sh '''
-                        flutter test || echo "WARNING: Tests failed"
+                        npm test -- --run || echo "WARNING: Tests failed"
                     '''
                 }
             }
@@ -103,20 +102,17 @@ pipeline {
 
         stage('Build Web') {
             steps {
-                dir("${FLUTTER_DIR}") {
-                    echo '=== Building Flutter Web ==='
+                dir("${WEB_DIR}") {
+                    echo '=== Building React Web App ==='
                     sh '''
-                        # Build for web with HTML renderer (better compatibility)
-                        flutter build web --release --web-renderer html
-                        
-                        # Or use CanvasKit renderer (better performance):
-                        # flutter build web --release --web-renderer canvaskit
+                        # Build production bundle
+                        npm run build
                         
                         echo "Web build completed:"
-                        ls -lh build/web/
+                        ls -lh dist/
                         
                         # Show build size
-                        du -sh build/web/
+                        du -sh dist/
                     '''
                 }
             }
@@ -124,14 +120,12 @@ pipeline {
 
         stage('Optimize Web Build') {
             steps {
-                dir("${FLUTTER_DIR}/build/web") {
+                dir("${WEB_DIR}/dist") {
                     echo '=== Optimizing web assets ==='
                     sh '''
-                        # Compress assets if needed
-                        echo "Build size before optimization:"
+                        # Vite already optimizes the build
+                        echo "Build size:"
                         du -sh .
-                        
-                        # Add optimization steps here (e.g., image compression, minification)
                         
                         echo "Web assets ready for deployment"
                     '''
@@ -142,10 +136,10 @@ pipeline {
         stage('Archive Artifacts') {
             steps {
                 echo '=== Archiving build artifacts ==='
-                dir("${FLUTTER_DIR}") {
+                dir("${WEB_DIR}") {
                     sh '''
                         mkdir -p ../artifacts/web
-                        cp -r build/web/* ../artifacts/web/
+                        cp -r dist/* ../artifacts/web/
                         
                         # Create tarball for easy deployment
                         cd ../artifacts
@@ -214,9 +208,9 @@ pipeline {
         always {
             echo '=== Collecting Reports ==='
             publishHTML([
-                reportDir: 'flutter_app/build/web',
+                reportDir: 'react-web/dist',
                 reportFiles: 'index.html',
-                reportName: 'Flutter Web Build Preview',
+                reportName: 'React Web Build Preview',
                 allowMissing: true
             ])
         }
@@ -226,11 +220,11 @@ pipeline {
             sh '''
                 cat > build-status-web.txt << EOF
 Build Status: SUCCESS
-Platform: Web
+Platform: Web (React)
 Build Number: ${BUILD_NUMBER}
 Branch: ${BRANCH_NAME}
 Timestamp: $(date)
-Build Size: $(du -sh flutter_app/build/web | cut -f1)
+Build Size: $(du -sh react-web/dist | cut -f1)
 Artifacts: web-build-${BUILD_NUMBER}.tar.gz
 EOF
                 cat build-status-web.txt
@@ -243,7 +237,7 @@ EOF
             sh '''
                 cat > build-status-web.txt << EOF
 Build Status: FAILURE
-Platform: Web
+Platform: Web (React)
 Build Number: ${BUILD_NUMBER}
 Branch: ${BRANCH_NAME}
 Timestamp: $(date)
@@ -255,8 +249,8 @@ EOF
         cleanup {
             echo '=== Cleaning Up ==='
             sh '''
-                cd flutter_app
-                flutter clean || true
+                cd react-web
+                rm -rf dist/ || true
             '''
         }
     }
