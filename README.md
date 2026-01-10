@@ -274,6 +274,78 @@ git push origin feature/new-feature
 
 ## Testing
 
+## 🤖 AI Agents for Development Workflow
+
+The project includes AI-powered automation tools that integrate ChatGPT for reasoning and planning with DeepSeek for debugging and implementation. These agents help automate build failure analysis, code reviews, and dependency updates.
+
+### AI Agents Setup
+
+1. **Install Python dependencies:**
+```bash
+pip install -r ai-agents/requirements.txt
+```
+
+2. **Configure API keys:**
+```bash
+# Edit ai-agents/api-keys.yaml or set environment variables
+export OPENAI_API_KEY="your-openai-key"
+export DEEPSEEK_API_KEY="your-deepseek-key"
+```
+
+3. **Test the setup:**
+```bash
+cd ai-agents
+chmod +x test-setup.sh
+./test-setup.sh
+```
+
+### Available Workflows
+
+#### Build Failure Analysis
+```bash
+# Analyze build failures automatically
+./ai-agents/run-ai-agents.sh build_failure "error log content" flutter
+```
+
+#### Code Review
+```bash
+# Review code changes for issues
+./ai-agents/run-ai-agents.sh code_review "code changes" "lib/main.dart"
+```
+
+#### Dependency Updates
+```bash
+# Analyze dependency compatibility
+./ai-agents/run-ai-agents.sh dependency_update "dependency changes"
+```
+
+### Integration with CI/CD
+
+The AI agents can be integrated with Jenkins pipelines for automated issue resolution:
+
+```groovy
+stage('AI Analysis') {
+    when {
+        expression { currentBuild.result == 'FAILURE' }
+    }
+    steps {
+        sh './ai-agents/run-ai-agents.sh build_failure "${BUILD_LOG}" flutter'
+    }
+}
+```
+
+### AI Agents Features
+
+- **ChatGPT Agent**: High-level reasoning, architecture planning, problem analysis
+- **DeepSeek Agent**: Code debugging, implementation fixes, compatibility checks
+- **Automated Workflows**: Build failure analysis, code review, dependency updates
+- **CI/CD Integration**: Jenkins webhook support, GitHub integration
+- **Security**: Encrypted API keys, rate limiting, audit logging
+
+📖 **Detailed Documentation**: See [`ai-agents/README.md`](ai-agents/README.md) for comprehensive setup and usage instructions.
+
+## Testing
+
 ### Backend Tests
 ```bash
 cd backend

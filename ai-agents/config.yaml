@@ -1,0 +1,84 @@
+# AI Agents Configuration for Phonetics App Development Workflow
+# This configuration enables automated issue resolution and build optimization
+
+# Main Configuration
+ai_agents:
+  enabled: true
+  workflow_mode: "hybrid"  # Options: chatgpt_only, deepseek_only, hybrid
+
+  # ChatGPT Configuration (for reasoning and planning)
+  chatgpt:
+    enabled: true
+    model: "gpt-4o"
+    api_endpoint: "https://api.openai.com/v1/chat/completions"
+    temperature: 0.7
+    max_tokens: 4000
+    system_prompt: "You are an expert Flutter developer and technical lead. Focus on reasoning, planning, and high-level architecture decisions."
+
+  # DeepSeek Configuration (for debugging and implementation)
+  deepseek:
+    enabled: true
+    model: "deepseek-coder"
+    api_endpoint: "https://api.deepseek.com/v1/chat/completions"
+    temperature: 0.3
+    max_tokens: 6000
+    system_prompt: "You are an expert debugger and implementation specialist. Focus on code fixes, debugging, and detailed implementation."
+
+# Workflow Triggers
+workflows:
+  build_failure:
+    enabled: true
+    trigger_on: ["jenkins_failure", "local_build_error"]
+    primary_agent: "deepseek"  # DeepSeek handles debugging
+    secondary_agent: "chatgpt"  # ChatGPT provides reasoning context
+
+  code_review:
+    enabled: true
+    trigger_on: ["pull_request", "commit"]
+    primary_agent: "chatgpt"  # ChatGPT for architectural review
+    secondary_agent: "deepseek"  # DeepSeek for code quality
+
+  dependency_update:
+    enabled: true
+    trigger_on: ["pubspec_change", "plugin_update"]
+    primary_agent: "deepseek"  # DeepSeek for compatibility checks
+    secondary_agent: "chatgpt"  # ChatGPT for impact analysis
+
+# Integration Points
+integrations:
+  jenkins:
+    enabled: true
+    webhook_url: "http://localhost:8080/ai-agent/webhook"
+    trigger_events: ["build_failure", "test_failure"]
+
+  github:
+    enabled: true
+    webhook_url: "http://localhost:8080/ai-agent/github-webhook"
+    trigger_events: ["pull_request", "issue_comment"]
+
+  local_development:
+    enabled: true
+    watch_paths: ["flutter_app/lib/", "flutter_app/pubspec.yaml"]
+    trigger_events: ["file_change", "build_error"]
+
+# Logging and Monitoring
+logging:
+  level: "INFO"
+  log_file: "ai-agents/logs/agent_activity.log"
+  max_log_size: "10MB"
+  retention_days: 30
+
+# Security
+security:
+  api_keys_encrypted: true
+  key_rotation_days: 90
+  rate_limiting:
+    requests_per_minute: 60
+    burst_limit: 10
+
+# Performance
+performance:
+  max_concurrent_requests: 3
+  request_timeout_seconds: 120
+  retry_attempts: 3
+  backoff_multiplier: 2.0

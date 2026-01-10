@@ -16,3 +16,16 @@ pluginManagement {
 }
 
 include ":app"
+
+// Local plugin dependencies
+include ":audio_session"
+project(":audio_session").projectDir = new File("../../../flutter_plugins/audio_session/android")
+
+include ":just_audio"
+project(":just_audio").projectDir = new File("../../../flutter_plugins/just_audio/just_audio/android")
+
+include ":path_provider_android"
+project(":path_provider_android").projectDir = new File("../../../flutter_plugins/plugins/packages/path_provider/path_provider_android/android")
+
+include ":sqflite_android"
+project(":sqflite_android").projectDir = new File("../../../flutter_plugins/sqflite/sqflite_android/android")

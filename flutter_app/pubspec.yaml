@@ -23,15 +23,31 @@ dependencies:
 
   # Networking & Local Storage
   http: ^1.1.0
-  sqflite: ^2.2.8
-  path_provider: ^2.0.15
+  sqflite:
+    path: ../flutter_plugins/sqflite/sqflite
+  path_provider:
+    path: ../flutter_plugins/plugins/packages/path_provider/path_provider
 
   # Audio
-  just_audio: ^0.9.30
-  audio_session: ^0.1.13
+  just_audio:
+    path: ../flutter_plugins/just_audio/just_audio
+  audio_session:
+    path: ../flutter_plugins/audio_session
 
   # Utilities
   uuid: ^4.0.0
+
+dependency_overrides:
+  path_provider:
+    path: ../flutter_plugins/plugins/packages/path_provider/path_provider
+  path_provider_android:
+    path: ../flutter_plugins/plugins/packages/path_provider/path_provider_android
+  audio_session:
+    path: ../flutter_plugins/audio_session
+  sqflite:
+    path: ../flutter_plugins/sqflite/sqflite
+  sqflite_android:
+    path: ../flutter_plugins/sqflite/sqflite_android
 
 dev_dependencies:
   flutter_test:
