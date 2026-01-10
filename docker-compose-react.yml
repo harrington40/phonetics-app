@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    container_name: phonetics-backend
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=${DATABASE_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - CORS_ORIGINS=http://localhost:3000,http://localhost:19006
+    volumes:
+      - ./backend:/app
+      - ./backend/uploads:/app/uploads
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    depends_on:
+      - db
+    networks:
+      - phonetics-network
+
+  web:
+    build: ./react-web
+    container_name: phonetics-web
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    volumes:
+      - ./react-web:/app
+      - /app/node_modules
+    command: npm run dev
+    depends_on:
+      - backend
+    networks:
+      - phonetics-network
+
+  db:
+    image: postgres:15-alpine
+    container_name: phonetics-db
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=phonetics
+      - POSTGRES_PASSWORD=phonetics123
+      - POSTGRES_DB=phonetics_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - phonetics-network
+
+volumes:
+  postgres_data:
+
+networks:
+  phonetics-network:
+    driver: bridge

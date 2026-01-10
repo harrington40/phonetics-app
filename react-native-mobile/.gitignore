@@ -1,0 +1,28 @@
+node_modules/
+.expo/
+npm-debug.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+web-build/
+.DS_Store
+*.log
+
+# Android
+android/app/build/
+android/.gradle/
+android/build/
+android/gradle/
+android/local.properties
+
+# iOS
+ios/Pods/
+ios/build/
+*.pbxuser
+!default.pbxuser
+*.xcworkspace
+!default.xcworkspace
+*.xcuserdatad/
