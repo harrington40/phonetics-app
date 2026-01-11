@@ -203,6 +203,22 @@ pipeline {
                             # Clean previous builds
                             ./gradlew clean
                             
+                            # Generate autolinking configuration manually (RN 0.76 workaround)
+                            mkdir -p build/generated/autolinking
+                            cat > build/generated/autolinking/autolinking.json << 'AUTOLINK_EOF'
+{
+  "project": {
+    "android": {
+      "packageName": "com.phoneticsapp",
+      "sourceDir": "./android/app"
+    }
+  },
+  "dependencies": {}
+}
+AUTOLINK_EOF
+                            echo "Generated autolinking.json"
+                            cat build/generated/autolinking/autolinking.json
+                            
                             # Run preBuild to ensure autolinking config is generated
                             ./gradlew :app:preBuild --no-daemon --stacktrace
                             
