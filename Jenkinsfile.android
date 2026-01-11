@@ -203,12 +203,9 @@ pipeline {
                             # Clean previous builds
                             ./gradlew clean
                             
-                            # Generate autolinking configuration (RN 0.76 requirement)
-                            echo "Generating autolinking configuration..."
-                            mkdir -p build/generated/autolinking
-                            cd ..
-                            npx react-native config || echo "Config command completed"
-                            cd android
+                            # Pre-generate autolinking configuration for RN 0.76
+                            echo "Pre-generating autolinking configuration..."
+                            ./gradlew :app:generateAutolinkingConfig --no-daemon || echo "Autolinking config generation attempted"
                             
                             # Build release APK
                             ./gradlew assembleRelease --no-daemon --stacktrace
