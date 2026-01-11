@@ -203,7 +203,10 @@ pipeline {
                             # Clean previous builds
                             ./gradlew clean
                             
-                            # Build release APK (autolinking runs automatically via preBuild)
+                            # Run preBuild to ensure autolinking config is generated
+                            ./gradlew :app:preBuild --no-daemon --stacktrace
+                            
+                            # Build release APK
                             ./gradlew assembleRelease --no-daemon --stacktrace
                             
                             echo "APK files created:"
