@@ -735,6 +735,65 @@
             color: #667eea;
             text-decoration: none;
         }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                background: white;
+                padding: 20px;
+            }
+
+            body::before, .top-nav, .button-group, .progress-bar,
+            .instructions, .status, button, nav {
+                display: none !important;
+            }
+
+            .container {
+                background: white;
+                box-shadow: none;
+                padding: 20px;
+                max-width: 100%;
+            }
+
+            .cartoon-animal {
+                display: none;
+            }
+
+            .lesson-info {
+                background: white;
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+
+            h1, h2, h3 {
+                color: black !important;
+            }
+
+            .printable-lesson {
+                display: block !important;
+                padding: 20px;
+                border: 2px solid black;
+                margin: 20px 0;
+                page-break-inside: avoid;
+            }
+
+            .print-instructions {
+                display: block !important;
+                border: 1px solid #ccc;
+                padding: 15px;
+                margin: 20px 0;
+                background: #f9f9f9;
+                page-break-inside: avoid;
+            }
+        }
+
+        .printable-lesson, .print-instructions {
+            display: none;
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+        }
     </style>
 </head>
 <body>
@@ -777,6 +836,51 @@
             <button class="btn-secondary" id="playLesson" disabled>Play & Animate</button>
             <button class="btn-outline" id="testMicBtn">Test Microphone</button>
             <button class="btn-success" id="recordBtn" disabled>🎤 Record & Practice</button>
+            <button class="btn-print" onclick="printLesson()">🖨️ Print Lesson</button>
+        </div>
+
+        <!-- Printable Lesson Content (hidden on screen, visible when printed) -->
+        <div class="printable-lesson" id="printableLesson">
+            <h1 style="text-align: center; border-bottom: 3px solid black; padding-bottom: 10px; margin-bottom: 30px;">Phonics Lesson</h1>
+            <div style="margin: 30px 0;">
+                <h2>Phoneme: <span id="printPhoneme" style="font-size: 2.5em; color: #667eea;"></span></h2>
+                <p style="font-size: 18px; margin-top: 10px;"><strong>IPA Symbol:</strong> <span id="printIPA"></span></p>
+            </div>
+            <div style="margin: 30px 0;">
+                <h3>Description:</h3>
+                <p id="printDescription" style="font-size: 16px; line-height: 1.8;"></p>
+            </div>
+            <div style="margin: 30px 0;">
+                <h3>How to Practice:</h3>
+                <ol style="font-size: 16px; line-height: 2;">
+                    <li>Say the phoneme sound out loud</li>
+                    <li>Pay attention to your mouth position</li>
+                    <li>Repeat the sound 5-10 times</li>
+                    <li>Try using it in words</li>
+                </ol>
+            </div>
+            <div style="margin: 30px 0;">
+                <h3>Audio Information:</h3>
+                <p id="printAudioInfo" style="font-size: 14px; color: #666;"></p>
+            </div>
+        </div>
+
+        <div class="print-instructions">
+            <h3>📝 Practice Checklist:</h3>
+            <div style="margin: 20px 0;">
+                <p style="font-size: 16px; line-height: 2.5;">
+                    ☐ Listened to the sound<br>
+                    ☐ Practiced pronunciation 10 times<br>
+                    ☐ Recorded my voice<br>
+                    ☐ Compared with the example<br>
+                    ☐ Ready for next lesson
+                </p>
+            </div>
+            <p style="margin-top: 30px; border-top: 1px solid #ccc; padding-top: 20px;">
+                <strong>Date:</strong> _______________  
+                <strong>Time Practiced:</strong> _______________ minutes<br>
+                <strong>Self-Rating:</strong> ☐ Needs More Practice  ☐ Good  ☐ Excellent
+            </p>
         </div>
         
         <div class="progress-bar">
@@ -1019,6 +1123,9 @@
             console.log('✅ Basic lesson info displayed');
             alert(`Lesson loaded: ${lesson.phoneme}`);
             
+            // Update printable content
+            updatePrintableLesson(lesson);
+            
             // Display appropriate graphic based on lesson type
             const graphicContainer = document.getElementById('activityGraphic');
             if (graphicContainer && activityGraphics) {
@@ -1048,6 +1155,25 @@
                 if (!graphicContainer) alert('Graphics container missing!');
                 if (!activityGraphics) alert('ActivityGraphics not initialized!');
             }
+        }
+        
+        function updatePrintableLesson(lesson) {
+            // Update printable lesson content
+            document.getElementById('printPhoneme').textContent = lesson.phoneme || 'N/A';
+            document.getElementById('printIPA').textContent = lesson.ipa_symbol || 'N/A';
+            document.getElementById('printDescription').textContent = lesson.prompt || lesson.description || 'Practice this phoneme sound';
+            
+            // Audio information
+            const audioInfo = `Visit the online app to hear the pronunciation: ${window.location.href}`;
+            document.getElementById('printAudioInfo').textContent = audioInfo;
+        }
+
+        function printLesson() {
+            if (!currentLesson) {
+                alert('Please load a lesson first before printing!');
+                return;
+            }
+            window.print();
         }
         
         function playPhonemeSound() {

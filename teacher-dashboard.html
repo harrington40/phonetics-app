@@ -104,6 +104,68 @@
             background: #e0e0e0;
         }
 
+        .btn-print {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn-print:hover {
+            background: #45a049;
+            transform: translateY(-2px);
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                background: white;
+                padding: 10px;
+            }
+
+            button, .controls, .filter-controls, .setup-section,
+            .action-buttons, input, select, .copy-btn {
+                display: none !important;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            header {
+                border-bottom: 2px solid black;
+                box-shadow: none;
+                page-break-after: avoid;
+            }
+
+            .header-left h1::after {
+                content: ' - Class Report';
+            }
+
+            .stat-card, .student-card, .students-section {
+                box-shadow: none;
+                border: 1px solid #ccc;
+                page-break-inside: avoid;
+            }
+
+            .dashboard-grid {
+                page-break-after: avoid;
+            }
+
+            h2, h3 {
+                color: black !important;
+            }
+
+            .print-date {
+                display: block !important;
+                font-size: 12px;
+                text-align: right;
+                margin-top: 10px;
+            }
+        }
+
+        .print-date {
+            display: none;
+        }
+
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -645,7 +707,9 @@
                 <div class="controls">
                     <button class="btn-secondary" onclick="refreshData()">🔄 Refresh</button>
                     <button class="btn-primary" onclick="startClass()">▶ Start Class</button>
+                    <button class="btn-print" onclick="printReport()">🖨️ Print Report</button>
                 </div>
+                <div class="print-date" id="printDate"></div>
             </div>
         </header>
 
@@ -1104,6 +1168,23 @@
         function refreshData() {
             loadStudentData();
             addFeedItem('🔄 Dashboard refreshed');
+        }
+
+        function printReport() {
+            // Update print date
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { 
+                weekday: 'long', 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('printDate').textContent = `Report Generated: ${dateStr}`;
+            
+            // Trigger print dialog
+            window.print();
         }
 
         // Check API status

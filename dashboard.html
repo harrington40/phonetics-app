@@ -316,6 +316,74 @@
             border-radius: 50%;
             animation: spin 1s linear infinite;
         }
+
+        .print-button {
+            background: #4CAF50;
+            margin-left: 10px;
+        }
+
+        .print-button:hover {
+            background: #45a049;
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                background: white;
+                padding: 20px;
+            }
+
+            header, nav, .stat-card, .recommendations, .milestone,
+            button, .no-print, .user-info {
+                display: none !important;
+            }
+
+            .container {
+                max-width: 100%;
+            }
+
+            .page {
+                display: block !important;
+            }
+
+            .lesson-container, .lesson-content {
+                background: white;
+                box-shadow: none;
+                page-break-inside: avoid;
+            }
+
+            h1, h2, h3 {
+                color: black !important;
+            }
+
+            .animal-canvas {
+                border: 2px solid black;
+            }
+
+            .lesson-header {
+                border-bottom: 2px solid black;
+                margin-bottom: 20px;
+            }
+
+            .printable-lesson {
+                display: block !important;
+                padding: 20px;
+                border: 2px solid black;
+                margin: 20px 0;
+            }
+
+            .print-instructions {
+                display: block !important;
+                border: 1px solid #ccc;
+                padding: 15px;
+                margin: 20px 0;
+                background: #f9f9f9;
+            }
+        }
+
+        .printable-lesson, .print-instructions {
+            display: none;
+        }
     </style>
 </head>
 <body>
@@ -383,7 +451,42 @@
                     <div style="text-align: center;">
                         <button id="playBtn" onclick="playLesson()">🔊 Play & Animate</button>
                         <button id="nextBtn" onclick="getNextLesson()">➡️ Next Lesson</button>
+                        <button class="print-button" onclick="printLesson()">🖨️ Print Lesson</button>
                     </div>
+                </div>
+
+                <!-- Printable Lesson Content (hidden on screen, visible when printed) -->
+                <div class="printable-lesson" id="printableLesson">
+                    <h1 style="text-align: center; border-bottom: 3px solid black; padding-bottom: 10px;">Phonics Lesson</h1>
+                    <div style="margin: 30px 0;">
+                        <h2>Phoneme: <span id="printPhoneme"></span></h2>
+                        <p><strong>IPA Symbol:</strong> <span id="printIPA"></span></p>
+                        <p><strong>Difficulty Level:</strong> <span id="printDifficulty"></span></p>
+                    </div>
+                    <div style="margin: 30px 0;">
+                        <h3>Description:</h3>
+                        <p id="printDescription" style="font-size: 16px; line-height: 1.6;"></p>
+                    </div>
+                    <div style="margin: 30px 0;">
+                        <h3>Example Words:</h3>
+                        <ul id="printExamples" style="font-size: 16px; line-height: 1.8;"></ul>
+                    </div>
+                    <div style="margin: 30px 0;">
+                        <h3>Viseme (Mouth Shape):</h3>
+                        <p id="printViseme" style="font-size: 16px;"></p>
+                    </div>
+                </div>
+
+                <div class="print-instructions">
+                    <h3>Practice Instructions:</h3>
+                    <ol style="line-height: 1.8;">
+                        <li>Look at the phoneme symbol and say it out loud</li>
+                        <li>Practice the correct mouth shape (viseme)</li>
+                        <li>Try the example words slowly at first</li>
+                        <li>Record yourself and compare to the examples</li>
+                        <li>Practice daily for best results</li>
+                    </ol>
+                    <p style="margin-top: 20px;"><strong>Date:</strong> _______________  <strong>Score:</strong> _______________</p>
                 </div>
 
                 <div style="text-align: center; margin-top: 20px;">
@@ -551,6 +654,9 @@
                     </div>
                 `;
 
+                // Update printable content
+                updatePrintableLesson(data);
+
                 // Draw animal
                 drawAnimal('rest');
 
@@ -559,6 +665,37 @@
                 console.error('Error:', e);
                 showStatus(`Error: ${e.message}`, 'error');
             }
+        }
+
+        function updatePrintableLesson(lesson) {
+            document.getElementById('printPhoneme').textContent = lesson.phoneme;
+            document.getElementById('printIPA').textContent = lesson.ipa_symbol || 'N/A';
+            document.getElementById('printDifficulty').textContent = lesson.difficulty || 'N/A';
+            document.getElementById('printDescription').textContent = lesson.prompt || lesson.description || 'Practice this sound';
+            
+            // Example words (if available)
+            const examplesEl = document.getElementById('printExamples');
+            if (lesson.example_words && lesson.example_words.length > 0) {
+                examplesEl.innerHTML = lesson.example_words.map(word => `<li>${word}</li>`).join('');
+            } else {
+                examplesEl.innerHTML = '<li>Practice with the audio</li>';
+            }
+            
+            // Viseme info
+            const visemeEl = document.getElementById('printViseme');
+            if (lesson.visemes && lesson.visemes.length > 0) {
+                visemeEl.textContent = `Mouth shape: ${lesson.visemes[0].shape || 'default'}`;
+            } else {
+                visemeEl.textContent = 'Watch the animation for correct mouth position';
+            }
+        }
+
+        function printLesson() {
+            if (!currentLesson) {
+                alert('Please load a lesson first!');
+                return;
+            }
+            window.print();
         }
 
         async function playLesson() {
