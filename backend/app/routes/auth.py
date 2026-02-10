@@ -39,6 +39,8 @@ class UserRegister(BaseModel):
     email: EmailStr
     password: str
     full_name: Optional[str] = None
+    role: Optional[str] = "student"  # student, teacher
+    teacher_code: Optional[str] = None  # For students enrolling with a teacher
     # Anti-spam fields
     honeypot: Optional[str] = None  # Should be empty
     captcha_token: Optional[str] = None  # reCAPTCHA/hCaptcha token
@@ -158,6 +160,24 @@ async def register(user_data: UserRegister, request: Request, db: Session = Depe
     # Sanitize inputs
     full_name = sanitize_input(user_data.full_name) if user_data.full_name else None
     
+    # Validate role
+    if user_data.role not in ["student", "teacher"]:
+        user_data.role = "student"  # Default to student
+    
+    # Find teacher if teacher_code provided (for student enrollment)
+    teacher_id = None
+    if user_data.role == "student" and user_data.teacher_code:
+        try:
+            from ..db.models import TeacherClass
+            teacher_class = db.query(TeacherClass).filter(
+                TeacherClass.class_code == user_data.teacher_code,
+                TeacherClass.is_active == True
+            ).first()
+            if teacher_class:
+                teacher_id = teacher_class.teacher_id
+        except Exception as e:
+            print(f"Teacher enrollment lookup failed: {e}")
+    
     # Create new user (password hashing disabled for testing)
     # hashed_password = hash_password(user_data.password)
     hashed_password = user_data.password  # Plain text for testing only
@@ -166,7 +186,9 @@ async def register(user_data: UserRegister, request: Request, db: Session = Depe
         password_hash=hashed_password,
         full_name=full_name,
         is_active=True,
-        role="user"
+        role=user_data.role,
+        has_paid=False,  # Default: payment required
+        teacher_id=teacher_id
     )
     
     # Try to save to database (graceful failure if no DB)
@@ -182,16 +204,19 @@ async def register(user_data: UserRegister, request: Request, db: Session = Depe
     
     # Create access token
     access_token = create_access_token(
-        data={"user_id": user_id, "email": user_data.email}
+        data={"user_id": user_id, "email": user_data.email, "role": user_data.role}
     )
     
     return {
         "access_token": access_token,
         "token_type": "bearer",
         "user": {
-            "id": new_user.id,
+            "id": new_user.id if hasattr(new_user, 'id') else user_id,
             "email": new_user.email,
-            "full_name": new_user.full_name
+            "full_name": new_user.full_name,
+            "role": new_user.role,
+            "has_paid": new_user.has_paid,
+            "teacher_id": new_user.teacher_id
         }
     }
 
@@ -233,6 +258,35 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
             detail="Account is disabled"
         )
     
+    # Check payment status for students
+    if user.role == "student" and not user.has_paid:
+        raise HTTPException(
+            status_code=status.HTTP_402_PAYMENT_REQUIRED,
+            detail="Payment required. Please complete payment to access student materials."
+        )
+    
+    # Get enrolled students if user is a teacher
+    enrolled_students = []
+    if user.role == "teacher":
+        try:
+            students = db.query(User).filter(
+                User.teacher_id == user.id,
+                User.role == "student",
+                User.is_active == True
+            ).all()
+            enrolled_students = [
+                {
+                    "id": s.id,
+                    "email": s.email,
+                    "full_name": s.full_name,
+                    "has_paid": s.has_paid,
+                    "created_at": s.created_at.isoformat() if s.created_at else None
+                }
+                for s in students
+            ]
+        except Exception as e:
+            print(f"Failed to fetch enrolled students: {e}")
+    
     # Create access token
     access_token = create_access_token(
         data={"user_id": user.id, "email": user.email, "role": user.role}
@@ -245,7 +299,10 @@ async def login(credentials: UserLogin, db: Session = Depends(get_db)):
             "id": user.id,
             "email": user.email,
             "full_name": user.full_name,
-            "role": user.role
+            "role": user.role,
+            "has_paid": user.has_paid,
+            "teacher_id": user.teacher_id,
+            "enrolled_students": enrolled_students if user.role == "teacher" else []
         }
     }
 
@@ -342,3 +399,207 @@ async def require_admin(current_user: User = Depends(get_current_user)):
             detail="Admin access required"
         )
     return current_user
+
+# Teacher role check dependency
+async def require_teacher(current_user: User = Depends(get_current_user)):
+    """
+    Require user to have teacher role
+    """
+    if current_user.role not in ["teacher", "admin"]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Teacher access required"
+        )
+    return current_user
+
+# ===== TEACHER ENDPOINTS =====
+
+@router.post("/teacher/create-class")
+async def create_teacher_class(
+    class_name: str,
+    description: Optional[str] = None,
+    max_students: int = 30,
+    current_user: User = Depends(require_teacher),
+    db: Session = Depends(get_db)
+):
+    """
+    Create a new class for teacher
+    Returns unique class code for student enrollment
+    """
+    import random
+    import string
+    from ..db.models import TeacherClass
+    
+    # Generate unique class code
+    class_code = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+    
+    # Check if code already exists
+    while db.query(TeacherClass).filter(TeacherClass.class_code == class_code).first():
+        class_code = ''.join(random.choices (string.ascii_uppercase + string.digits, k=8))
+    
+    new_class = TeacherClass(
+        teacher_id=current_user.id,
+        class_name=class_name,
+        class_code=class_code,
+        description=description,
+        max_students=max_students,
+        is_active=True
+    )
+    
+    try:
+        db.add(new_class)
+        db.commit()
+        db.refresh(new_class)
+        
+        return {
+            "message": "Class created successfully",
+            "class_code": class_code,
+            "class_name": class_name,
+            "max_students": max_students
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to create class: {str(e)}"
+        )
+
+@router.get("/teacher/students")
+async def get_enrolled_students(
+    current_user: User = Depends(require_teacher),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all students enrolled with this teacher
+    """
+    try:
+        students = db.query(User).filter(
+            User.teacher_id == current_user.id,
+            User.role == "student",
+            User.is_active == True
+        ).all()
+        
+        return {
+            "total_students": len(students),
+            "students": [
+                {
+                    "id": s.id,
+                    "email": s.email,
+                    "full_name": s.full_name,
+                    "has_paid": s.has_paid,
+                    "created_at": s.created_at.isoformat() if s.created_at else None
+                }
+                for s in students
+            ]
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch students: {str(e)}"
+        )
+
+@router.get("/teacher/classes")
+async def get_teacher_classes(
+    current_user: User = Depends(require_teacher),
+    db: Session = Depends(get_db)
+):
+    """
+    Get all classes created by this teacher
+    """
+    try:
+        from ..db.models import TeacherClass
+        classes = db.query(TeacherClass).filter(
+            TeacherClass.teacher_id == current_user.id
+        ).all()
+        
+        return {
+            "total_classes": len(classes),
+            "classes": [
+                {
+                    "id": c.id,
+                    "class_name": c.class_name,
+                    "class_code": c.class_code,
+                    "description": c.description,
+                    "max_students": c.max_students,
+                    "is_active": c.is_active,
+                    "created_at": c.created_at.isoformat() if c.created_at else None
+                }
+                for c in classes
+            ]
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch classes: {str(e)}"
+        )
+
+# ===== PAYMENT / ADMIN ENDPOINTS =====
+
+@router.post("/admin/mark-paid/{user_id}")
+async def mark_student_paid(
+    user_id: int,
+    current_user: User = Depends(require_teacher),  # Teachers can mark their students as paid
+    db: Session = Depends(get_db)
+):
+    """
+    Mark a student as paid (accessible by teachers for their students and admins)
+    """
+    student = db.query(User).filter(User.id == user_id, User.role == "student").first()
+    
+    if not student:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Student not found"
+        )
+    
+    # Teachers can only mark their own students as paid
+    if current_user.role == "teacher" and student.teacher_id != current_user.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="You can only mark your enrolled students as paid"
+        )
+    
+    student.has_paid = True
+    student.updated_at = datetime.utcnow()
+    
+    try:
+        db.commit()
+        db.refresh(student)
+        
+        return {
+            "message": "Student marked as paid",
+            "student": {
+                "id": student.id,
+                "email": student.email,
+                "full_name": student.full_name,
+                "has_paid": student.has_paid
+            }
+        }
+    except Exception as e:
+        db.rollback()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to update payment status: {str(e)}"
+        )
+
+@router.get("/check-access")
+async def check_user_access(current_user: User = Depends(get_current_user)):
+    """
+    Check user's access level and permissions
+    """
+    can_access_materials = True
+    access_message = "Full access"
+    
+    if current_user.role == "student" and not current_user.has_paid:
+        can_access_materials = False
+        access_message = "Payment required to access student materials"
+    
+    return {
+        "user_id": current_user.id,
+        "email": current_user.email,
+        "role": current_user.role,
+        "has_paid": current_user.has_paid,
+        "can_access_materials": can_access_materials,
+        "access_message": access_message,
+        "teacher_id": current_user.teacher_id
+    }

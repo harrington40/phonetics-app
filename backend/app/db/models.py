@@ -16,8 +16,10 @@ class User(Base):
     email = Column(String, unique=True, index=True, nullable=False)
     password_hash = Column(String, nullable=False)
     full_name = Column(String)
-    role = Column(String, default="user")  # user, admin
+    role = Column(String, default="student")  # student, teacher, admin
     is_active = Column(Boolean, default=True)
+    has_paid = Column(Boolean, default=False)  # Payment verification for students
+    teacher_id = Column(Integer, ForeignKey("users.id"), nullable=True)  # For students enrolled with a teacher
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
     
@@ -25,6 +27,9 @@ class User(Base):
     licenses = relationship("License", back_populates="user")
     students = relationship("Student", back_populates="user")
     payments = relationship("Payment", back_populates="user")
+    # Teacher-Student relationship
+    enrolled_students = relationship("User", back_populates="teacher", foreign_keys="User.teacher_id")
+    teacher = relationship("User", back_populates="enrolled_students", foreign_keys=[teacher_id], remote_side=[id])
 
 class License(Base):
     __tablename__ = "licenses"
@@ -135,3 +140,16 @@ class EmailLog(Base):
     sendgrid_message_id = Column(String, nullable=True)
     error_message = Column(Text, nullable=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+class TeacherClass(Base):
+    __tablename__ = "teacher_classes"
+    
+    id = Column(Integer, primary_key=True, index=True)
+    teacher_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    class_name = Column(String, nullable=False)
+    class_code = Column(String, unique=True, index=True, nullable=False)  # Used for student enrollment
+    description = Column(Text, nullable=True)
+    max_students = Column(Integer, default=30)
+    is_active = Column(Boolean, default=True)
+    created_at = Column(DateTime, default=datetime.utcnow)
+    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)

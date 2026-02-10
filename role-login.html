@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Role-Based Login - PhonicsLearn</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+            text-align: center;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+            text-align: center;
+        }
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        .tab.active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+        .btn {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        .message {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+        .error {
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+        }
+        .success {
+            background: #e8f5e9;
+            color: #2e7d32;
+            border: 1px solid #a5d6a7;
+        }
+        .info {
+            background: #e3f2fd;
+            color: #1565c0;
+            border: 1px solid #90caf9;
+        }
+        .link {
+            text-align: center;
+            margin-top: 20px;
+            color: #666;
+            font-size: 14px;
+        }
+        .link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        .link a:hover {
+            text-decoration: underline;
+        }
+        .hidden {
+            display: none;
+        }
+        .role-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎓 PhonicsLearn</h1>
+        <p class="subtitle">Role-Based Access System</p>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('login')">Login</button>
+            <button class="tab" onclick="switchTab('register')">Register</button>
+        </div>
+
+        <div id="message" class="message"></div>
+
+        <!-- Login Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="loginEmail" required placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="loginPassword" required placeholder="Enter password">
+            </div>
+            <button type="submit" class="btn">Login</button>
+        </form>
+
+        <!-- Register Form -->
+        <form id="registerForm" class="hidden" onsubmit="handleRegister(event)">
+            <div class="form-group">
+                <label>Full Name</label>
+                <input type="text" id="regName" required placeholder="John Doe">
+            </div>
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="regEmail" required placeholder="your@email.com">
+            </div>
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="regPassword" required placeholder="Min 8 chars, include A-Z, a-z, 0-9">
+            </div>
+            <div class="form-group">
+                <label>I am a:</label>
+                <select id="regRole" onchange="toggleTeacherCode()">
+                    <option value="student">Student</option>
+                    <option value="teacher">Teacher</option>
+                </select>
+            </div>
+            <div class="form-group hidden" id="teacherCodeGroup">
+                <label>Teacher Class Code (Optional)</label>
+                <input type="text" id="teacherCode" placeholder="Enter class code from your teacher">
+                <small style="color: #666; font-size: 12px;">If you have a class code from your teacher, enter it here</small>
+            </div>
+            <div class="role-info" id="roleInfo">
+                <strong>Student Account:</strong> Access learning materials after payment verification.
+            </div>
+            <button type="submit" class="btn">Register</button>
+        </form>
+
+        <div class="link">
+            <p id="switchLink"></p>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:8000';
+        let currentMode = 'login';
+
+        function switchTab(mode) {
+            currentMode = mode;
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const tabs = document.querySelectorAll('.tab');
+
+            if (mode === 'login') {
+                loginForm.classList.remove('hidden');
+                registerForm.classList.add('hidden');
+                tabs[0].classList.add('active');
+                tabs[1].classList.remove('active');
+            } else {
+                loginForm.classList.add('hidden');
+                registerForm.classList.remove('hidden');
+                tabs[0].classList.remove('active');
+                tabs[1].classList.add('active');
+            }
+            hideMessage();
+        }
+
+        function toggleTeacherCode() {
+            const role = document.getElementById('regRole').value;
+            const teacherCodeGroup = document.getElementById('teacherCodeGroup');
+            const roleInfo = document.getElementById('roleInfo');
+
+            if (role === 'student') {
+                teacherCodeGroup.classList.remove('hidden');
+                roleInfo.innerHTML = '<strong>Student Account:</strong> Access learning materials after payment verification.';
+            } else {
+                teacherCodeGroup.classList.add('hidden');
+                roleInfo.innerHTML = '<strong>Teacher Account:</strong> Create classes and manage your enrolled students.';
+            }
+        }
+
+        function showMessage(text, type) {
+            const msg = document.getElementById('message');
+            msg.textContent = text;
+            msg.className = `message ${type}`;
+            msg.style.display = 'block';
+        }
+
+        function hideMessage() {
+            document.getElementById('message').style.display = 'none';
+        }
+
+        async function handleLogin(event) {
+            event.preventDefault();
+            hideMessage();
+
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/login`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({email, password})
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    showMessage('Login successful! Redirecting...', 'success');
+
+                    // Redirect based on role
+                    setTimeout(() => {
+                        if (data.user.role === 'teacher') {
+                            window.location.href = 'teacher-dashboard.html';
+                        } else if (data.user.role === 'student') {
+                            if (data.user.has_paid) {
+                                window.location.href = 'dashboard.html';
+                            } else {
+                                window.location.href = 'payment-required.html';
+                            }
+                        } else {
+                            window.location.href = 'index.html';
+                        }
+                    }, 1500);
+                } else {
+                    const error = await response.json();
+                    if (response.status === 402) {
+                        showMessage('Payment required. Redirecting to payment page...', 'info');
+                        setTimeout(() => {
+                            window.location.href = 'payment-required.html';
+                        }, 2000);
+                    } else {
+                        showMessage(error.detail || 'Login failed', 'error');
+                    }
+                }
+            } catch (error) {
+                showMessage('Network error. Is the server running?', 'error');
+                console.error('Login error:', error);
+            }
+        }
+
+        async function handleRegister(event) {
+            event.preventDefault();
+            hideMessage();
+
+            const fullName = document.getElementById('regName').value;
+            const email = document.getElementById('regEmail').value;
+            const password = document.getElementById('regPassword').value;
+            const role = document.getElementById('regRole').value;
+            const teacherCode = document.getElementById('teacherCode').value;
+
+            const payload = {
+                full_name: fullName,
+                email,
+                password,
+                role,
+                teacher_code: teacherCode || null
+            };
+
+            try {
+                const response = await fetch(`${API_BASE}/auth/register`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    localStorage.setItem('access_token', data.access_token);
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
+                    showMessage('Registration successful! Redirecting...', 'success');
+
+                    setTimeout(() => {
+                        if (data.user.role === 'teacher') {
+                            window.location.href = 'teacher-dashboard.html';
+                        } else {
+                            window.location.href = 'payment-required.html';
+                        }
+                    }, 1500);
+                } else {
+                    const error = await response.json();
+                    showMessage(error.detail || 'Registration failed', 'error');
+                }
+            } catch (error) {
+                showMessage('Network error. Is the server running?', 'error');
+                console.error('Registration error:', error);
+            }
+        }
+
+        // Initialize
+        toggleTeacherCode();
+    </script>
+</body>
+</html>
